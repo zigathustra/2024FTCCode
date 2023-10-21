@@ -21,7 +21,7 @@ public class OmniDriveEncoder extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        final double MAX_VELOCITY = RevMotorInfo.MAX_VELOCITY;
+        final double MAX_VELOCITY = RevUltra20DcMotorData.maxCountsPerSec;
         telemetry.addData("Status", "Initializing...");
         telemetry.update();
 
