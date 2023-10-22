@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -15,9 +14,9 @@ public class OmniDriveEncoder extends LinearOpMode {
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotorEx leftFrontDrive = null;
-    private DcMotorEx leftBackDrive = null;
+    private DcMotorEx leftRearDrive = null;
     private DcMotorEx rightFrontDrive = null;
-    private DcMotorEx rightBackDrive = null;
+    private DcMotorEx rightRearDrive = null;
 
     @Override
     public void runOpMode() {
@@ -28,19 +27,19 @@ public class OmniDriveEncoder extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
         leftFrontDrive  = hardwareMap.get(DcMotorEx.class, "left_front_drive");
-        leftBackDrive  = hardwareMap.get(DcMotorEx.class, "left_back_drive");
+        leftRearDrive  = hardwareMap.get(DcMotorEx.class, "left_rear_drive");
         rightFrontDrive = hardwareMap.get(DcMotorEx.class, "right_front_drive");
-        rightBackDrive = hardwareMap.get(DcMotorEx.class, "right_back_drive");
+        rightRearDrive = hardwareMap.get(DcMotorEx.class, "right_rear_drive");
 
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
+        leftRearDrive.setDirection(DcMotorEx.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        rightRearDrive.setDirection(DcMotorEx.Direction.REVERSE);
 
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFrontDrive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        leftRearDrive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        rightRearDrive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -51,7 +50,7 @@ public class OmniDriveEncoder extends LinearOpMode {
         runtime.reset();
 
         while (opModeIsActive()) {
-            double max;
+            double max = 0;
 
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
@@ -61,38 +60,38 @@ public class OmniDriveEncoder extends LinearOpMode {
             // Set up a variable for each drive wheel to save the power level for telemetry.
             double leftFrontPower  = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower   = axial - lateral + yaw;
-            double rightBackPower  = axial + lateral - yaw;
+            double leftRearPower   = axial - lateral + yaw;
+            double rightRearPower  = axial + lateral - yaw;
 
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
             max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-            max = Math.max(max, Math.abs(leftBackPower));
-            max = Math.max(max, Math.abs(rightBackPower));
+            max = Math.max(max, Math.abs(leftRearPower));
+            max = Math.max(max, Math.abs(rightRearPower));
 
             if (max > 1.0) {
                 leftFrontPower  /= max;
                 rightFrontPower /= max;
-                leftBackPower   /= max;
-                rightBackPower  /= max;
+                leftRearPower   /= max;
+                rightRearPower  /= max;
             }
 
             leftFrontDrive.setVelocity(leftFrontPower * MAX_VELOCITY);
             rightFrontDrive.setVelocity(rightFrontPower * MAX_VELOCITY);
-            leftBackDrive.setVelocity(leftBackPower * MAX_VELOCITY);
-            rightBackDrive.setVelocity(rightBackPower * MAX_VELOCITY);
-            logVelocity();
+            leftRearDrive.setVelocity(leftRearPower * MAX_VELOCITY);
+            rightRearDrive.setVelocity(rightRearPower * MAX_VELOCITY);
+ //           logVelocity();
         }
     }
     private void logVelocity() {
         telemetry.addData("leftFrontDrive (counts/sec): ",  "%7d :%7d",
                 leftFrontDrive.getVelocity());
-        telemetry.addData("leftBackDrive (counts/sec): ",  "%7d :%7d",
-                leftBackDrive.getVelocity());
+        telemetry.addData("leftRearDrive (counts/sec): ",  "%7d :%7d",
+                leftRearDrive.getVelocity());
         telemetry.addData("rightFrontDrive (counts/sec): ",  "%7d :%7d",
                 rightFrontDrive.getVelocity());
-        telemetry.addData("rightBackDrive (counts/sec): ",  "%7d :%7d",
-                rightBackDrive.getVelocity());
+        telemetry.addData("rightRearDrive (counts/sec): ",  "%7d :%7d",
+                rightRearDrive.getVelocity());
         telemetry.update();
     }
 }
