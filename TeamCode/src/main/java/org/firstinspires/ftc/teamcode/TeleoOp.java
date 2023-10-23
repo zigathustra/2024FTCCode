@@ -66,4 +66,5 @@ public class TeleoOp extends LinearOpMode {
 
         }
     }
+    private void logTelemetry(){};
 }

@@ -30,11 +30,11 @@ public class AutoRedClose extends LinearOpMode {
         final double liftCruisingHeight = 8;
         final double distanceToMiddleOfRedSquare = 25;
         final double headingOutOfRedSquare = -155;
-        final double headingOfBoard = -75;
+        final double headingOfBoard = -60;
         final double distanceOutOfSquare = 23;
-        final double creepSpeed = 0.25;
         final double targetDistanceFromTag = 14.0;
-        final double parkingHeading = 0;
+        final double backOutDistance = 6;
+        final double parkingHeading = 10;
         final double parkingDistance = 18;
         final double placementDistance = 8;
 
@@ -55,6 +55,9 @@ public class AutoRedClose extends LinearOpMode {
         // Determine prop position
         // propPosition = bot.tfDetermineObjectPosition();
         propPosition = bot.dsDetermineObjectPosition(objectDistanceThreshold);
+//        telemetry.addData("propPosition: ", propPosition);
+//        telemetry.update();
+//        sleep(4000);
 
         // Calculate heading of prop relative to last imu reset
         propHeading = (propPosition - 2) * (-90);
@@ -71,12 +74,16 @@ public class AutoRedClose extends LinearOpMode {
         // Turn toward board
         bot.turnToHeading(headingOfBoard);
 
+        bot.moveStraightForDistance(6);
+
         // Move forward slowly
-        bot.moveDirection(creepSpeed, 0, 0);
-        targetTagNumber = propPosition * alliance;
+        targetTagNumber = propPosition + ((alliance-1) * 3);
+//        telemetry.addData("targetTagNumber: ", targetTagNumber);
+ //       telemetry.update();
+ //       sleep(4000);
         bot.autoDriveToAprilTag(targetTagNumber, targetDistanceFromTag);
 
-        bot.moveStraightToObject(4);
+        bot.moveStraightToObject(2);
 
         // Strafe to drop alignment
         // Raise lift to drop height
@@ -84,17 +91,21 @@ public class AutoRedClose extends LinearOpMode {
         // Creep up to drop distance
         // Open grabber
         // Back away
+        bot.moveStraightForDistance(-5);
         // Lower wrist
         // Lower lift to cruising height
 
-//        bot.turnToHeading(parkingHeading);
+        bot.turnToHeading(0);
         // Move to parking position
-//        bot.moveStraightForDistance(parkingDistance);
+        bot.moveStraightForDistance(9 + (propPosition * 6));
 
+        bot.turnToHeading(-90);
+        bot.moveStraightForDistance(12);
         // Lower lift to position 0!!!!!
 
         //sleep(10);   // milliseconds
         //      }
 
     }
+    private void logTelemetry(){};
 }
