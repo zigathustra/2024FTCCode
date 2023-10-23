@@ -32,12 +32,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class Robot {
-
+public class Bot {
     // Attributes for hardware
     protected DriveTrain driveTrain = null;
     protected Lift lift = null;
-    protected final double liftPowerFactor = 0.7;   // Default of 0.7
     protected Rev2mDistanceSensor distanceSensor = null;
     protected Servo wrist = null;
     protected double wristDownPosition = 0.0;
@@ -45,10 +43,9 @@ public class Robot {
     protected Servo grabber = null;
     protected double grabberClosedPosition = 0.3;
     protected double grabberOpenPosition = 0.7;
-    protected CameraName camera = null;
     protected LinearOpMode opMode = null;
 
-    public Robot(LinearOpMode opMode) {
+    public Bot(LinearOpMode opMode) {
         this.opMode = opMode;
 
         driveTrain = new DriveTrain(opMode);
@@ -63,13 +60,12 @@ public class Robot {
 
         distanceSensor = opMode.hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
 
-        camera = opMode.hardwareMap.get(WebcamName.class, "Webcam 1");
     }
 
     // Turn to a specified heading in degrees
     // 0 is straight ahead
-    // < 0 is CCW
-    // > 0 is CW
+    // > 0 is CCW
+    // < 0 is CW
     public void turnToHeading(double heading) {
         driveTrain.turnToHeading(heading);
     }
@@ -83,15 +79,37 @@ public class Robot {
         driveTrain.moveDirection(axial, strafe, yaw);
     }
 
+    public void creepDirection(double axial, double strafe, double yaw) {
+        driveTrain.creepDirection(axial, strafe, yaw);
+    }
+
     // Move straight for a specified distance in inches
     public void moveStraightForDistance(double distance) {
         driveTrain.moveStraightForDistance(distance);
     }
 
-    private VisionPortal createVisionPortal(AprilTagProcessor aprilTagProcessor) {
-        VisionPortal visionPortal = new VisionPortal.Builder().setCamera(camera)
-                .addProcessor(aprilTagProcessor).build();
-        return visionPortal;
+    public void liftUp(double speed) {
+        lift.move(speed);
+    }
+
+    public void liftDown(double speed) {
+        lift.move(-speed);
+    }
+    public void liftStop(){lift.stop();}
+
+    public void wristUp() {
+        wrist.setPosition(wristUpPosition);
+    }
+
+    public void wristDown() {
+        wrist.setPosition(wristDownPosition);
+    }
+    public void grabberOpen() {
+        grabber.setPosition(grabberOpenPosition);
+    }
+
+    public void grabberClose() {
+        grabber.setPosition(grabberClosedPosition);
     }
 }
 

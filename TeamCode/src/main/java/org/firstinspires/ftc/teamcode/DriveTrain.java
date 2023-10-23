@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -19,15 +20,14 @@ public class DriveTrain {
     private DcMotorEx rightRearDrive = null;
     private final double turnGain = 0.02;   // Larger is more responsive, but also less stable
     private final double driveGain = 0.03;
-    // These constants define the desired driving/control characteristics
-    // They can/should be tweaked to suit the specific robot drive train.
-    private final double maxAutoDriveSpeed = 0.4;     // Max driving speed for better distance accuracy.
-    private final double maxAutoTurnSpeed = 0.2;// Max Turn speed to limit turn rate
+    private final double maxNormalSpeed = 0.7;
+    private final double creepSpeedFactor = 0.25;
+    private final double maxCorrectionDriveSpeed = 0.5;     // Max driving speed for better distance accuracy.
+    private final double maxCorrectionTurnSpeed = 0.3;// Max Turn speed to limit turn rate
     private final double headingThreshold = 1.0;   // How close must the heading get to the target before moving to next step.
     // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
-    private final double powerFactor = 0.7;
-    private final double maxVelocity = RevUltra20DcMotorData.maxCountsPerSec;
-    private final double countsPerInch = RevUltra20DcMotorData.countsPerInch;
+    private final double maxVelocity = RevCoreHexMotor.maxCountsPerSec;
+    private final double countsPerInch = RevCoreHexMotor.countsPerInch;
     private IMU imu = null;
     LinearOpMode opMode = null;
 
@@ -54,21 +54,22 @@ public class DriveTrain {
 
         imu = opMode.hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(orientationOnRobot));
+        imu.resetYaw();
     }
 
     public void turnToHeading(double targetHeading) {
-        double turnSpeed = maxAutoTurnSpeed;
+        double turnSpeed = maxCorrectionTurnSpeed;
         double headingError = getHeadingError(targetHeading);
 
         // keep looping while we are still active, and not on heading.
-        while (Math.abs(headingError) > headingThreshold){
+        while (Math.abs(headingError) > headingThreshold) {
             headingError = getHeadingError(targetHeading);
 
             // Determine required steering to keep on heading
             turnSpeed = getSteeringCorrection(headingError, turnGain);
 
             // Clip the speed to the maximum permitted value.
-            turnSpeed = Range.clip(turnSpeed, -maxAutoTurnSpeed, maxAutoTurnSpeed);
+            turnSpeed = Range.clip(turnSpeed, -maxCorrectionTurnSpeed, maxCorrectionTurnSpeed);
 
             // Pivot in place by applying the turning correction
             moveDirection(0, 0, turnSpeed);
@@ -82,12 +83,15 @@ public class DriveTrain {
         turnToHeading(targetHeading);
     }
 
+    public void creepDirection(double axial, double strafe, double yaw){
+        moveDirection(axial * creepSpeedFactor, strafe * creepSpeedFactor, yaw * creepSpeedFactor);
+    }
     public void moveDirection(double axial, double strafe, double yaw) {
         // Calculate wheel powers.
         double leftFrontPower = axial - strafe - yaw;
         double rightFrontPower = axial + strafe + yaw;
         double leftRearPower = axial + strafe - yaw;
-        double rightRearPower = axial + strafe + yaw;
+        double rightRearPower = axial - strafe + yaw;
 
         // Normalize wheel powers to be less than 1.0
         double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
@@ -100,11 +104,15 @@ public class DriveTrain {
             leftRearPower /= max;
             rightRearPower /= max;
         }
-
-        leftFrontDrive.setVelocity(leftFrontPower * powerFactor * maxVelocity);
-        rightFrontDrive.setVelocity(rightFrontPower * powerFactor * maxVelocity);
-        leftRearDrive.setVelocity(leftRearPower * powerFactor * maxVelocity);
-        rightRearDrive.setVelocity(rightRearPower * powerFactor * maxVelocity);
+    //    opMode.telemetry.addData("leftFrontPower: ", leftFrontPower);
+    //    opMode.telemetry.addData("powerFactor: ", powerFactor);
+    //    opMode.telemetry.addData("maxVelocity: ", maxVelocity);
+    //    opMode.telemetry.update();
+    //    opMode.sleep(10000);
+        leftFrontDrive.setVelocity(leftFrontPower * maxNormalSpeed * maxVelocity);
+        rightFrontDrive.setVelocity(rightFrontPower * maxNormalSpeed * maxVelocity);
+        leftRearDrive.setVelocity(leftRearPower * maxNormalSpeed * maxVelocity);
+        rightRearDrive.setVelocity(rightRearPower * maxNormalSpeed * maxVelocity);
     }
 
     public void moveStraightForDistance(double distance) {
@@ -114,8 +122,8 @@ public class DriveTrain {
         int rightFrontTarget = 0;
         int rightRearTarget = 0;
         double headingError = 0;
-        double turnSpeed = maxAutoTurnSpeed;
-        double driveSpeed = maxAutoDriveSpeed;
+        double turnSpeed = maxCorrectionTurnSpeed;
+        double driveSpeed = maxCorrectionDriveSpeed;
         double targetHeading = getHeading();
 
         leftFrontTarget = leftFrontDrive.getCurrentPosition() + targetCounts;
@@ -130,12 +138,29 @@ public class DriveTrain {
 
         setRunToPosition();
 
+ //       opMode.telemetry.addData("lf: ", leftFrontDrive.getTargetPosition());
+ //       opMode.telemetry.addData("lr: ", leftRearDrive.getTargetPosition());
+ //       opMode.telemetry.addData("rf: ", rightFrontDrive.getTargetPosition());
+ //       opMode.telemetry.addData("rr: ", rightRearDrive.getTargetPosition());
+ //       opMode.telemetry.update();
+ //       opMode.sleep(5000);
         // Set the required driving speed  (must be positive for RUN_TO_POSITION)
         // Start driving straight, and then enter the control loop
         moveDirection(driveSpeed, 0, 0);
-
-        // keep looping while we are still active, and BOTH motors are running.
+        //      while (leftFrontDrive.isBusy()){
+        //          opMode.telemetry.addData("leftFrontDrive ", "isBusy");
+        //          opMode.telemetry.update();
+        //          opMode.sleep(1000);
+        //      }
+        // keep looping all motors are running.
+//        opMode.telemetry.addData("lf: ", leftFrontDrive.isBusy());
+//        opMode.telemetry.addData("lr: ", leftRearDrive.isBusy());
+//        opMode.telemetry.addData("rf: ", rightFrontDrive.isBusy());
+//        opMode.telemetry.addData("rr: ", rightRearDrive.isBusy());
+//        opMode.telemetry.update();
+//        opMode.sleep(5000);
         while (leftFrontDrive.isBusy() && leftRearDrive.isBusy() && rightFrontDrive.isBusy() && rightRearDrive.isBusy()) {
+        //while (leftFrontDrive.isBusy()) {
             headingError = getHeadingError(targetHeading);
             // Determine required steering to keep on heading
             turnSpeed = getSteeringCorrection(headingError, driveGain);
@@ -173,8 +198,8 @@ public class DriveTrain {
 
     private void stop() {
         leftFrontDrive.setVelocity(0.0);
-        rightFrontDrive.setVelocity(0.0);
         leftRearDrive.setVelocity(0.0);
+        rightFrontDrive.setVelocity(0.0);
         rightRearDrive.setVelocity(0.0);
     }
 
@@ -194,21 +219,21 @@ public class DriveTrain {
 
     private void stopAndResetEncoders() {
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightRearDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftRearDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRearDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     private void setRunUsingEncoder() {
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightRearDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftRearDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightRearDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     private void setRunToPosition() {
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightRearDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftRearDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightRearDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
