@@ -27,19 +27,19 @@ public class TeleoOp extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            driveAxial = gamepad1.left_stick_y;
-            driveStrafe = gamepad1.left_stick_x;
-            driveYaw = gamepad1.right_stick_x;
-            bot.moveDirection(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-
             if (gamepad1.dpad_up) {
-                bot.creepDirection(1.0, 0.0, 0.0);
-            } else if (gamepad1.dpad_down) {
                 bot.creepDirection(-1.0, 0.0, 0.0);
+            } else if (gamepad1.dpad_down) {
+                bot.creepDirection(1.0, 0.0, 0.0);
             } else if (gamepad1.dpad_left) {
                 bot.creepDirection(0.0, -1.0, 0.0);
             } else if (gamepad1.dpad_right) {
                 bot.creepDirection(0.0, 1.0, 0.0);
+            } else {
+                driveAxial = gamepad1.left_stick_y;
+                driveStrafe = gamepad1.left_stick_x;
+                driveYaw = gamepad1.right_stick_x;
+                bot.moveDirection(gamepad1.left_stick_y, gamepad1.left_stick_x, -gamepad1.right_stick_x);
             }
 
             leftTrigger = gamepad1.left_trigger;
@@ -66,5 +66,9 @@ public class TeleoOp extends LinearOpMode {
 
         }
     }
-    private void logTelemetry(){};
+
+    private void logTelemetry() {
+    }
+
+    ;
 }

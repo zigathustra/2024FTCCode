@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import static java.lang.Thread.sleep;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 //@Autonomous(name = "AutoRedClose", group = "Linear OpMode")
 @TeleOp(name = "AutoRedClose", group = "Linear OpMode")
+@Disabled
 public class AutoRedClose extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runTime = null;

@@ -21,13 +21,13 @@ public class DriveTrain {
     private final double turnGain = 0.02;   // Larger is more responsive, but also less stable
     private final double driveGain = 0.03;
     private final double maxNormalSpeed = 0.8;
-    private final double creepSpeedFactor = 0.25;
+    private final double creepSpeedFactor = 0.15;
     private final double maxCorrectionDriveSpeed = 0.8;     // Max driving speed for better distance accuracy.
     private final double maxCorrectionTurnSpeed = 0.8;// Max Turn speed to limit turn rate
     private final double headingThreshold = 1.0;   // How close must the heading get to the target before moving to next step.
     // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
-    private final double maxVelocity = RevCoreHexMotor.maxCountsPerSec;
-    private final double countsPerInch = RevCoreHexMotor.countsPerInch;
+    private final double maxVelocity = RevUltra20DcMotorData.maxCountsPerSec;
+    private final double countsPerInch = RevUltra20DcMotorData.countsPerInch;
     private IMU imu = null;
     LinearOpMode opMode = null;
 

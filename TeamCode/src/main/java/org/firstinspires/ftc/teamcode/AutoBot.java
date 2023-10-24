@@ -23,11 +23,14 @@ public class AutoBot extends Bot {
 
     private AprilTagProcessor aprilTagProcessor = null;
     private VisionPortal visionPortal = null;
+    protected Rev2mDistanceSensor distanceSensor = null;
 
     public AutoBot(LinearOpMode opMode) {
         super(opMode);
         opMode.telemetry.addData("Status: ", "AutoBot lives!");
         opMode.telemetry.update();
+        distanceSensor = opMode.hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
+
     }
 
     public void autoDriveToAprilTag(int targetTagNumber, double targetDistanceFromTag) {

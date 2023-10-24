@@ -36,13 +36,12 @@ public class Bot {
     // Attributes for hardware
     protected DriveTrain driveTrain = null;
     protected Lift lift = null;
-    protected Rev2mDistanceSensor distanceSensor = null;
     protected Servo wrist = null;
-    protected double wristDownPosition = 0.0;
-    protected double wristUpPosition = 0.7;
+    protected double wristDownPosition = 0.4;
+    protected double wristUpPosition = 0.75;
     protected Servo grabber = null;
-    protected double grabberClosedPosition = 0.3;
-    protected double grabberOpenPosition = 0.7;
+    protected double grabberClosedPosition = 0.4;
+    protected double grabberOpenPosition = 1.5;
     protected LinearOpMode opMode = null;
 
     public Bot(LinearOpMode opMode) {
@@ -50,15 +49,13 @@ public class Bot {
 
         driveTrain = new DriveTrain(opMode);
 
-//        lift = new Lift(opMode, liftPowerFactor);
+        lift = new Lift(opMode);
 
-//        wrist = opMode.hardwareMap.get(Servo.class, "wrist");
-//        wrist.setPosition(wristDownPosition);
+        wrist = opMode.hardwareMap.get(Servo.class, "wrist");
+        wrist.setPosition(wristDownPosition);
 
-        //       grabber = opMode.hardwareMap.get(Servo.class, "grabber");
-        //       grabber.setPosition(grabberClosedPosition);
-
-        distanceSensor = opMode.hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
+        grabber = opMode.hardwareMap.get(Servo.class, "grabber");
+        grabber.setPosition(grabberClosedPosition);
 
     }
 
@@ -89,13 +86,16 @@ public class Bot {
     }
 
     public void liftUp(double speed) {
-        lift.move(speed);
+        lift.liftUp(speed);
     }
 
     public void liftDown(double speed) {
-        lift.move(-speed);
+        lift.liftDown(speed);
     }
-    public void liftStop(){lift.stop();}
+
+    public void liftStop() {
+        lift.stop();
+    }
 
     public void wristUp() {
         wrist.setPosition(wristUpPosition);
@@ -104,6 +104,7 @@ public class Bot {
     public void wristDown() {
         wrist.setPosition(wristDownPosition);
     }
+
     public void grabberOpen() {
         grabber.setPosition(grabberOpenPosition);
     }
@@ -112,7 +113,8 @@ public class Bot {
         grabber.setPosition(grabberClosedPosition);
     }
 
-    private void logTelemetry(){};
+    private void logTelemetry() {
+    }
 }
 
 
