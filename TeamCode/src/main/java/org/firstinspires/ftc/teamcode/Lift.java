@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCapt
 public class Lift {
     private DcMotorEx liftMotor = null;
     private double movePowerFactor = 1.0;
-    private double stopPowerFactor = 0.5;
+    private double stopPowerFactor = 1.0;
     private double maxVelocity = GoBilda312DcMotorData.maxCountsPerSec;
     private int maxPosition = 3000;
     private int maxTolerance = 25;
