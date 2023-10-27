@@ -17,8 +17,6 @@ import java.util.concurrent.TimeUnit;
 public class TeleOpBot extends Bot {
     public TeleOpBot(LinearOpMode opMode) {
         super(opMode);
-        opMode.telemetry.addData("Status: ", "TeleOpBot lives!");
-        opMode.telemetry.update();
     }
 }
 

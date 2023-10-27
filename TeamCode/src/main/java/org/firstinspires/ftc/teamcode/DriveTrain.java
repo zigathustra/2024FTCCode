@@ -20,19 +20,17 @@ public class DriveTrain {
     private DcMotorEx rightRearDrive = null;
     private final double turnGain = 0.02;   // Larger is more responsive, but also less stable
     private final double driveGain = 0.03;
-    private final double maxNormalSpeed = 0.4;
+    private final double maxNormalSpeed = 0.8; // Factor (0.0-1.0) to control drive speed
     private final double creepSpeedFactor = 0.15;
-    private final double maxCorrectionDriveSpeed = 0.4;     // Max driving speed for better distance accuracy.
+    private final double maxCorrectionDriveSpeed = 0.4; // Max driving speed for better distance accuracy
     private final double maxCorrectionTurnSpeed = 0.4;// Max Turn speed to limit turn rate
-    private final double headingThreshold = 1.0;   // How close must the heading get to the target before moving to next step.
-    // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
+    private final double headingThreshold = 1.0;   // How close the heading must be to the target
     private final double maxVelocity = RevUltra20DcMotorData.maxCountsPerSec;
     private final double countsPerInch = RevUltra20DcMotorData.countsPerInch;
     private IMU imu = null;
     LinearOpMode opMode = null;
 
     public DriveTrain(LinearOpMode opMode) {
-
         this.opMode = opMode;
         leftFrontDrive = opMode.hardwareMap.get(DcMotorEx.class, "left_front_drive");
         leftRearDrive = opMode.hardwareMap.get(DcMotorEx.class, "left_rear_drive");
@@ -73,10 +71,6 @@ public class DriveTrain {
 
             // Pivot in place by applying the turning correction
             moveDirection(0, 0, turnSpeed);
-
-//            opMode.telemetry.addData("targetHeading", targetHeading);
-//            opMode.telemetry.addData("Heading", getHeading());
-//            opMode.telemetry.update();
         }
         stop();
     }
@@ -108,11 +102,7 @@ public class DriveTrain {
             leftRearPower /= max;
             rightRearPower /= max;
         }
-        //    opMode.telemetry.addData("leftFrontPower: ", leftFrontPower);
-        //    opMode.telemetry.addData("powerFactor: ", powerFactor);
-        //    opMode.telemetry.addData("maxVelocity: ", maxVelocity);
-        //    opMode.telemetry.update();
-        //    opMode.sleep(10000);
+
         leftFrontDrive.setVelocity(leftFrontPower * maxNormalSpeed * maxVelocity);
         rightFrontDrive.setVelocity(rightFrontPower * maxNormalSpeed * maxVelocity);
         leftRearDrive.setVelocity(leftRearPower * maxNormalSpeed * maxVelocity);
@@ -170,27 +160,6 @@ public class DriveTrain {
 
         setRunToPosition();
 
-        //       opMode.telemetry.addData("lf: ", leftFrontDrive.getTargetPosition());
-        //       opMode.telemetry.addData("lr: ", leftRearDrive.getTargetPosition());
-        //       opMode.telemetry.addData("rf: ", rightFrontDrive.getTargetPosition());
-        //       opMode.telemetry.addData("rr: ", rightRearDrive.getTargetPosition());
-        //       opMode.telemetry.update();
-        //       opMode.sleep(5000);
-        // Set the required driving speed  (must be positive for RUN_TO_POSITION)
-        // Start driving straight, and then enter the control loop
-        moveDirection(driveSpeed, 0, 0);
-        //      while (leftFrontDrive.isBusy()){
-        //          opMode.telemetry.addData("leftFrontDrive ", "isBusy");
-        //          opMode.telemetry.update();
-        //          opMode.sleep(1000);
-        //      }
-        // keep looping all motors are running.
-//        opMode.telemetry.addData("lf: ", leftFrontDrive.isBusy());
-//        opMode.telemetry.addData("lr: ", leftRearDrive.isBusy());
-//        opMode.telemetry.addData("rf: ", rightFrontDrive.isBusy());
-//        opMode.telemetry.addData("rr: ", rightRearDrive.isBusy());
-//        opMode.telemetry.update();
-//        opMode.sleep(5000);
         while (leftFrontDrive.isBusy() && leftRearDrive.isBusy() && rightFrontDrive.isBusy() && rightRearDrive.isBusy()) {
             //while (leftFrontDrive.isBusy()) {
             headingError = getHeadingError(targetHeading);
@@ -268,11 +237,5 @@ public class DriveTrain {
         leftRearDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightRearDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
     }
-
-    public void logTelemetry() {
-    }
-
-    ;
 }

@@ -124,9 +124,6 @@ public class Bot {
     public void grabberClose() {
         grabber.setPosition(grabberClosedPosition);
     }
-
-    private void logTelemetry() {
-    }
 }
 
 

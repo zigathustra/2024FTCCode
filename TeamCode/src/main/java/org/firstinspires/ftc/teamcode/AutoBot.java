@@ -20,18 +20,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class AutoBot extends Bot {
-
     private AprilTagProcessor aprilTagProcessor = null;
     private VisionPortal visionPortal = null;
     protected Rev2mDistanceSensor distanceSensor = null;
 
     public AutoBot(LinearOpMode opMode) {
         super(opMode);
- //       opMode.telemetry.addData("Status: ", "AutoBot lives!");
- //       opMode.telemetry.update();
         distanceSensor = opMode.hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
     }
-
     public void autoDriveToAprilTag(int targetTagNumber, double targetDistanceFromTag) {
         AprilTagDetection targetTag = null;
         boolean targetFound = false;
@@ -106,7 +102,7 @@ public class AutoBot extends Bot {
                 opMode.telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", axialPower, strafePower, yawPower);
             } else {
                 // scan for tags
-                if ((totalAngle >= maxTotalAngle) || (totalAngle <= minTotalAngle)){
+                if ((totalAngle >= maxTotalAngle) || (totalAngle <= minTotalAngle)) {
                     scanAngle = -scanAngle;
                 }
                 totalAngle = totalAngle + scanAngle;
@@ -127,7 +123,7 @@ public class AutoBot extends Bot {
 
     // Scan for prop in one of three positions
     // Return position 1, 2, or 3 (left, right, or center)
-    public int dsPlacePurplePixel(){
+    public int dsPlacePurplePixel() {
         final double propDistanceThreshold = 10;
         final int position1Heading = -270;
         final int position2Heading = 0;
@@ -143,9 +139,6 @@ public class AutoBot extends Bot {
         int objectPosition = 3;
         boolean objectFound = false;
 
-//        opMode.telemetry.addData("dsDetObjPos", "");
-//        opMode.telemetry.update();
-//        opMode.sleep(3000);
         strafeDistance = position2StrafeDistance;
         turnToHeading(position2Heading);
         strafeForDistance(-strafeDistance);
@@ -154,15 +147,8 @@ public class AutoBot extends Bot {
             objectFound = true;
             objectPosition = 2;
         }
-  //      opMode.telemetry.addData("objectFound", objectFound);
-  //      opMode.telemetry.update();
-  //      opMode.sleep(3000);
-        if (!objectFound){
+        if (!objectFound) {
             strafeForDistance(strafeDistance);
-//            opMode.telemetry.addData("heading", object3Heading);
-//            opMode.telemetry.update();
-//            opMode.sleep(3000);
-//            opMode.sleep(500);
             strafeDistance = position3StrafeDistance;
             turnToHeading(position3Heading);
             strafeForDistance(-strafeDistance);
@@ -174,24 +160,17 @@ public class AutoBot extends Bot {
                 objectFound = true;
                 objectPosition = 1;
                 strafeForDistance(strafeDistance);
-//                wristDown();
                 turnToHeading(position1Heading);
-//                wristUp();
                 strafeDistance = -position1StrafeDistance;
                 strafeForDistance(-strafeDistance);
             }
-//            opMode.telemetry.addData("objectPosition", objectPosition);
-//            opMode.telemetry.update();
-//            opMode.sleep(3000);
         }
         objectDistance = distanceSensor.getDistance(DistanceUnit.INCH);
         moveStraightForDistance(placementDistanceOffset + objectDistance);
         moveStraightForDistance(-placementDistanceOffset - objectDistance);
         strafeForDistance(strafeDistance);
-//        opMode.telemetry.addData("objectPosition", objectPosition);
-//        opMode.telemetry.update();
-//        opMode.sleep(3000);
-        return(objectPosition);
+
+        return (objectPosition);
     }
 
     public void moveStraightToObject(double targetDistance) {
@@ -219,10 +198,10 @@ public class AutoBot extends Bot {
                 .build();
     }
 
-    /*
-     Manually set the camera gain and exposure.
-     This can only be called AFTER calling initAprilTag(), and only works for Webcams;
-    */
+
+    //   Manually set the camera gain and exposure.
+    //   This can only be called AFTER calling initAprilTag(), and only works for Webcams;
+
     private void setManualExposure(int exposureMS, int gain) {
         // Wait for the camera to be open, then use the controls
 

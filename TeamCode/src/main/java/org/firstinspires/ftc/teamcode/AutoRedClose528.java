@@ -32,14 +32,7 @@ public class AutoRedClose528 extends LinearOpMode {
         final double parkingDistance2 = 8;
         final double parkingDistance3 = 10;
 
-
-        //       telemetry.addData("Status: ", "Initialized");
-        //       telemetry.update();
         waitForStart();
-
-        //       while (opModeIsActive()) {
-//            telemetry.addData("Status: ", "Start of auto");
-//            telemetry.update();
 
         // Raise lift to cruising and sensing height
         bot.wristUp();
@@ -51,25 +44,6 @@ public class AutoRedClose528 extends LinearOpMode {
 
         propPosition = bot.dsPlacePurplePixel();
 
-//        telemetry.addData("propPosition: ", propPosition);
-//        telemetry.update();
-//        sleep(3000);
-
-        // Calculate heading of prop relative to last imu reset
-        //       propHeading = ((propPosition - 2) * (-90)) + 15;
-//        if (propPosition == 2) {
-//            bot.turnToHeading(prop2Heading);
-//        } else if (propPosition == 3) {
-//            bot.turnToHeading(prop3Heading);
-//        } else {
-//            bot.turnToHeading(prop1Heading);
-//            bot.strafeForDistance(-3);
-//        }
-//        bot.moveStraightForDistance(placementDistance);
-//        bot.moveStraightForDistance(-placementDistance);
-//        telemetry.addData("propPosition: ", propPosition);
-//        telemetry.update();
-//        sleep(2000);
         // Turn toward escape corner of red square
         bot.turnToHeading(headingOutOfSquare);
 
@@ -94,5 +68,4 @@ public class AutoRedClose528 extends LinearOpMode {
         // Move to parking position
         // Lower lift to position 0!!!!!
     }
-    //}
 }
