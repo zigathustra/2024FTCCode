@@ -27,10 +27,9 @@ public class AutoBot extends Bot {
 
     public AutoBot(LinearOpMode opMode) {
         super(opMode);
-        opMode.telemetry.addData("Status: ", "AutoBot lives!");
-        opMode.telemetry.update();
+ //       opMode.telemetry.addData("Status: ", "AutoBot lives!");
+ //       opMode.telemetry.update();
         distanceSensor = opMode.hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
-
     }
 
     public void autoDriveToAprilTag(int targetTagNumber, double targetDistanceFromTag) {
@@ -126,34 +125,73 @@ public class AutoBot extends Bot {
         }
     }
 
-    public void dsTestDetection() {
-        //opMode.telemetry.addData("Status: ", "Inside dsTestDetection start");
-        //opMode.telemetry.update();
-        for (int i = 90; i > -90; i = i - 2) {
-            turnToHeading(i);
-            opMode.telemetry.addData("Heading (deg): ", i);
-            opMode.telemetry.addData("Distance (in): ", distanceSensor.getDistance(DistanceUnit.INCH));
-            opMode.telemetry.update();
-            opMode.sleep(500);
-        }
-    }
-
     // Scan for prop in one of three positions
     // Return position 1, 2, or 3 (left, right, or center)
-    public int dsDetermineObjectPosition(double threshold) {
-        int objectPosition = 0;
+    public int dsPlacePurplePixel(){
+        final double propDistanceThreshold = 10;
+        final int position1Heading = -270;
+        final int position2Heading = 0;
+        final int position3Heading = -90;
+        final double placementDistanceOffset = 5.5;
+        double objectDistance = 0;
 
-        if (distanceSensor.getDistance(DistanceUnit.INCH) < threshold) {
-            return 2;
+        final double position1StrafeDistance = 3;
+        final double position2StrafeDistance = 3.5;
+        final double position3StrafeDistance = 12;
+        double strafeDistance = 0;
+
+        int objectPosition = 3;
+        boolean objectFound = false;
+
+//        opMode.telemetry.addData("dsDetObjPos", "");
+//        opMode.telemetry.update();
+//        opMode.sleep(3000);
+        strafeDistance = position2StrafeDistance;
+        turnToHeading(position2Heading);
+        strafeForDistance(-strafeDistance);
+        objectDistance = distanceSensor.getDistance(DistanceUnit.INCH);
+        if (objectDistance < propDistanceThreshold) {
+            objectFound = true;
+            objectPosition = 2;
         }
-
-        turnToHeading(-90);
-
-        if (distanceSensor.getDistance(DistanceUnit.INCH) < threshold) {
-            return 3;
-        } else {
-            return 1;
+  //      opMode.telemetry.addData("objectFound", objectFound);
+  //      opMode.telemetry.update();
+  //      opMode.sleep(3000);
+        if (!objectFound){
+            strafeForDistance(strafeDistance);
+//            opMode.telemetry.addData("heading", object3Heading);
+//            opMode.telemetry.update();
+//            opMode.sleep(3000);
+//            opMode.sleep(500);
+            strafeDistance = position3StrafeDistance;
+            turnToHeading(position3Heading);
+            strafeForDistance(-strafeDistance);
+            objectDistance = distanceSensor.getDistance(DistanceUnit.INCH);
+            if (objectDistance < propDistanceThreshold) {
+                objectFound = true;
+                objectPosition = 3;
+            } else {
+                objectFound = true;
+                objectPosition = 1;
+                strafeForDistance(strafeDistance);
+//                wristDown();
+                turnToHeading(position1Heading);
+//                wristUp();
+                strafeDistance = -position1StrafeDistance;
+                strafeForDistance(-strafeDistance);
+            }
+//            opMode.telemetry.addData("objectPosition", objectPosition);
+//            opMode.telemetry.update();
+//            opMode.sleep(3000);
         }
+        objectDistance = distanceSensor.getDistance(DistanceUnit.INCH);
+        moveStraightForDistance(placementDistanceOffset + objectDistance);
+        moveStraightForDistance(-placementDistanceOffset - objectDistance);
+        strafeForDistance(strafeDistance);
+//        opMode.telemetry.addData("objectPosition", objectPosition);
+//        opMode.telemetry.update();
+//        opMode.sleep(3000);
+        return(objectPosition);
     }
 
     public void moveStraightToObject(double targetDistance) {

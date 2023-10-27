@@ -80,9 +80,9 @@ public class Lift {
         return stop;
     }
 
-    private void stopAtPosition(int targetPosition) {
-        liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+    public void stopAtPosition(int targetPosition) {
         liftMotor.setTargetPosition(targetPosition);
+        liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         liftMotor.setPower(stopPowerFactor);
         brakeOn = true;
     }

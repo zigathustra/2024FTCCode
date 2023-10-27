@@ -85,6 +85,14 @@ public class Bot {
         driveTrain.moveStraightForDistance(distance);
     }
 
+    public void strafeForDistance(double distance) {
+        driveTrain.encoderStrafeForDistance(distance);
+    }
+
+    public void stopDrive() {
+        driveTrain.moveDirection(0, 0, 0);
+    }
+
     public void liftUp(double speed) {
         lift.liftUp(speed);
     }
@@ -95,6 +103,10 @@ public class Bot {
 
     public void liftStop() {
         lift.stop();
+    }
+
+    public void liftStopAtPosition(int position) {
+        lift.stopAtPosition(position);
     }
 
     public void wristUp() {

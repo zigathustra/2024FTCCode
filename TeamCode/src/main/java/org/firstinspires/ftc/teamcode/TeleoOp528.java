@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "TeleOp", group = "Linear OpMode")
-public class TeleoOp extends LinearOpMode {
+@TeleOp(name = "TeleOp528", group = "Linear OpMode")
+public class TeleoOp528 extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runTime = null;
     private TeleOpBot bot = null;
