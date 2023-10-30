@@ -2,10 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "TeleOp528", group = "Linear OpMode")
-public class TeleoOp528 extends LinearOpMode {
+@TeleOp(name = "TeleoOpOmniLiftWristGrabber", group = "Linear OpMode")
+public class TeleoOpOmniLiftWristGrabber extends LinearOpMode {
     private TeleOpBot bot = null;
 
     @Override
