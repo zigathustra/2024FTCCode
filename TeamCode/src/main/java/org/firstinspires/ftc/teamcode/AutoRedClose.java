@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -9,14 +8,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class AutoRedClose extends LinearOpMode {
     // Declare OpMode members.
-    private ElapsedTime runTime = null;
     private AutoBot528 bot = null;
     private int alliance = 2;   // 1=Blue, 2=Red
     private final double objectDistanceThreshold = 10;   // inches
 
     @Override
     public void runOpMode() {
-        runTime = new ElapsedTime();
         bot = new AutoBot528(this);
         int propPosition = 3;
 
