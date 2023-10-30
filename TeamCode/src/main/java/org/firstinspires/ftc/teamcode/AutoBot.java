@@ -19,7 +19,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class AutoBot extends Bot {
+public abstract class AutoBot extends Bot {
     private AprilTagProcessor aprilTagProcessor = null;
     private VisionPortal visionPortal = null;
     protected Rev2mDistanceSensor distanceSensor = null;
@@ -28,6 +28,7 @@ public class AutoBot extends Bot {
         super(opMode);
         distanceSensor = opMode.hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
     }
+
     public void autoDriveToAprilTag(int targetTagNumber, double targetDistanceFromTag) {
         AprilTagDetection targetTag = null;
         boolean targetFound = false;
@@ -176,6 +177,42 @@ public class AutoBot extends Bot {
     public void moveStraightToObject(double targetDistance) {
         double objectDistance = distanceSensor.getDistance(DistanceUnit.INCH);
         moveStraightForDistance(objectDistance - targetDistance);
+    }
+
+    public void setToCruisingPosition() {
+        wristUp();
+        grabberClose();
+        liftStopAtPosition(550);
+    }
+
+    public void escapeSquare(int propPosition) {
+
+        turnToHeading(-90);
+        if (propPosition == 2) {
+            moveStraightForDistance(24);
+            strafeForDistance(-24);
+        } else {
+            strafeForDistance(-24);
+            moveStraightForDistance(24);
+        }
+
+    }
+
+    public void moveToCenterOfSquare() {
+        moveStraightForDistance(25);
+    }
+
+    public void moveStraightAndPark() {
+        moveStraightToObject(16);
+        turnToHeading(0);
+        strafeForDistance(12);
+        stopDrive();
+    }
+
+    public void setStationaryPosition() {
+        wristDown();
+        grabberOpen();
+        liftStopAtPosition(0);
     }
 
     private void initAprilTag() {
