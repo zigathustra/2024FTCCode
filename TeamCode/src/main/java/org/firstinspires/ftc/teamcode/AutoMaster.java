@@ -10,15 +10,19 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public abstract class AutoMaster extends LinearOpMode {
     // Declare OpMode members.
     protected AutoBot bot = null;
-    static protected int alliance;   // 1=Blue, 2=Red
-    private int propPosition = 3;
+    protected int alliance;   // 1=Red, 2=Blue
+    private int propPosition = 0;
     private int targetAprilTagNumber = 0;
-    final int direction = (int) Math.pow(-1, alliance);
+    protected int direction = 0;
 
     @Override
     public void runOpMode() {
         bot = new AutoBot(this);
-
+        if (alliance == 2) {
+            direction = -1;
+        } else {
+            direction = 1;
+        }
         waitForStart();
 
         // Raise lift, raise wrist, close grabber
@@ -71,6 +75,11 @@ public abstract class AutoMaster extends LinearOpMode {
         } else {
             bot.strafeForDistance(strafeVector);
             strafeVector = direction * Constants.dsPosition3StrafeDistance;
+            telemetry.addData("direction: ", direction);
+            telemetry.addData("pos 3 heading", Constants.dsPosition3Heading);
+            telemetry.addData("alliance: ", alliance);
+            telemetry.update();
+            sleep(3000);
             bot.turnToHeading(direction * Constants.dsPosition3Heading);
             bot.strafeForDistance(-strafeVector);
             objectDistance = bot.getDistance();
