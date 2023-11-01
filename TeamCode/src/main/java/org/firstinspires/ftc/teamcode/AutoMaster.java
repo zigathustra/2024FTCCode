@@ -8,12 +8,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 public abstract class AutoMaster extends LinearOpMode {
-    // Declare OpMode members.
     protected AutoBot bot = null;
-    protected int alliance;   // 1=Red, 2=Blue
+    protected int alliance = 0;   // 1=Red, 2=Blue
     private int propPosition = 0;
     private int targetAprilTagNumber = 0;
     protected int direction = 0;
+
+    public AutoMaster(int alliance) {
+        this.alliance = alliance;
+    }
 
     @Override
     public void runOpMode() {
