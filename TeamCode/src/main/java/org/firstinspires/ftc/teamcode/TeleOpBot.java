@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TeleOpBot extends Bot {
     public TeleOpBot(LinearOpMode opMode) {
-        super(opMode);
+        super(opMode, Constants.maxNormalSpeed);
     }
 }
 

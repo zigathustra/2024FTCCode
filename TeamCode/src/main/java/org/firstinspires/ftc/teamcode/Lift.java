@@ -8,17 +8,7 @@ import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCapt
 
 public class Lift {
     private DcMotorEx liftMotor = null;
-    private double movePowerFactor = 1.0;
-    private double stopPowerFactor = 1.0;
-    private double maxVelocity = GoBilda312DcMotorData.maxCountsPerSec;
-    private int maxPosition = 3000;
-    private int maxTolerance = 25;
-
-    private int minPosition = 0;
-
-    private int minTolerance = 25;
     private boolean brakeOn = false;
-
     private LinearOpMode opMode = null;
 
     public Lift(LinearOpMode opMode) {
@@ -38,7 +28,7 @@ public class Lift {
     public void liftUp(double targetSpeed) {
         if (!stoppedAtTop()) {
             liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            liftMotor.setVelocity(targetSpeed * movePowerFactor * maxVelocity);
+            liftMotor.setVelocity(targetSpeed * Constants.liftMaxMoveSpeed * Constants.liftMaxVelocity);
             opMode.telemetry.addData("Stopped at Top: ", "true");
         } else {
             opMode.telemetry.addData("Stopped at Top: ", "false");
@@ -51,7 +41,7 @@ public class Lift {
     public void liftDown(double targetSpeed) {
         if (!stoppedAtBottom()) {
             liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            liftMotor.setVelocity(-targetSpeed * movePowerFactor * maxVelocity);
+            liftMotor.setVelocity(-targetSpeed * Constants.liftMaxMoveSpeed * Constants.liftMaxVelocity);
             opMode.telemetry.addData("Stopped at Bottom: ", " true");
         } else {
             opMode.telemetry.addData("Stopped at Bottom: ", " false");
@@ -63,9 +53,9 @@ public class Lift {
     private boolean stoppedAtTop() {
         boolean stop = false;
         int currentPosition = liftMotor.getCurrentPosition();
-        if (currentPosition > (maxPosition - maxTolerance)) {
+        if (currentPosition > (Constants.liftMaxPosition - Constants.liftMaxTolerance)) {
             stop = true;
-            stopAtPosition(maxPosition);
+            stopAtPosition(Constants.liftMaxPosition);
         }
         return stop;
     }
@@ -73,9 +63,9 @@ public class Lift {
     private boolean stoppedAtBottom() {
         boolean stop = false;
         int currentPosition = liftMotor.getCurrentPosition();
-        if (currentPosition < (minPosition - minTolerance)) {
+        if (currentPosition < (Constants.liftMinPosition - Constants.liftminTolerance)) {
             stop = true;
-            stopAtPosition(minPosition);
+            stopAtPosition(Constants.liftMinPosition);
         }
         return stop;
     }
@@ -83,12 +73,14 @@ public class Lift {
     public void stopAtPosition(int targetPosition) {
         liftMotor.setTargetPosition(targetPosition);
         liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        liftMotor.setPower(stopPowerFactor);
+        liftMotor.setPower(Constants.liftStopPowerFactor);
+        while (liftMotor.isBusy()){
+        }
         brakeOn = true;
     }
 
     public void moveToPosition(int targetPosition) {
-        if ((targetPosition < maxPosition) && (targetPosition > minPosition)) {
+        if ((targetPosition < Constants.liftMaxPosition) && (targetPosition > Constants.liftMinPosition)) {
             stopAtPosition(targetPosition);
         }
     }

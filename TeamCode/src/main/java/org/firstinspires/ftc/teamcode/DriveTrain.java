@@ -18,20 +18,13 @@ public class DriveTrain {
     private DcMotorEx rightFrontDrive = null;
     private DcMotorEx leftRearDrive = null;
     private DcMotorEx rightRearDrive = null;
-    private final double turnGain = 0.02;   // Larger is more responsive, but also less stable
-    private final double driveGain = 0.03;
-    private final double maxNormalSpeed = 0.8; // Factor (0.0-1.0) to control drive speed
-    private final double creepSpeedFactor = 0.15;
-    private final double maxCorrectionDriveSpeed = 0.4; // Max driving speed for better distance accuracy
-    private final double maxCorrectionTurnSpeed = 0.4;// Max Turn speed to limit turn rate
-    private final double headingThreshold = 1.0;   // How close the heading must be to the target
-    private final double maxVelocity = RevUltra20DcMotorData.maxCountsPerSec;
-    private final double countsPerInch = RevUltra20DcMotorData.countsPerInch;
+    private double maxSpeed = 0.8; // Factor (0.0-1.0) to control drive speed
     private IMU imu = null;
     LinearOpMode opMode = null;
 
-    public DriveTrain(LinearOpMode opMode) {
+    public DriveTrain(LinearOpMode opMode, double maxSpeed) {
         this.opMode = opMode;
+        this.maxSpeed = maxSpeed;
         leftFrontDrive = opMode.hardwareMap.get(DcMotorEx.class, "left_front_drive");
         leftRearDrive = opMode.hardwareMap.get(DcMotorEx.class, "left_rear_drive");
         rightFrontDrive = opMode.hardwareMap.get(DcMotorEx.class, "right_front_drive");
@@ -56,18 +49,18 @@ public class DriveTrain {
     }
 
     public void turnToHeading(double targetHeading) {
-        double turnSpeed = maxCorrectionTurnSpeed;
+        double turnSpeed = Constants.maxAutoCorrectionTurnSpeed;
         double headingError = getHeadingError(targetHeading);
 
         // keep looping while we are still active, and not on heading.
-        while (Math.abs(headingError) > headingThreshold) {
+        while (Math.abs(headingError) > Constants.autoHeadingThreshold) {
             headingError = getHeadingError(targetHeading);
 
             // Determine required steering to keep on heading
-            turnSpeed = getSteeringCorrection(headingError, turnGain);
+            turnSpeed = getSteeringCorrection(headingError, Constants.autoTurnGain);
 
             // Clip the speed to the maximum permitted value.
-            turnSpeed = Range.clip(turnSpeed, -maxCorrectionTurnSpeed, maxCorrectionTurnSpeed);
+            turnSpeed = Range.clip(turnSpeed, -Constants.maxAutoCorrectionTurnSpeed, Constants.maxAutoCorrectionTurnSpeed);
 
             // Pivot in place by applying the turning correction
             moveDirection(0, 0, turnSpeed);
@@ -81,7 +74,7 @@ public class DriveTrain {
     }
 
     public void creepDirection(double axial, double strafe, double yaw) {
-        moveDirection(axial * creepSpeedFactor, strafe * creepSpeedFactor, yaw * creepSpeedFactor);
+        moveDirection(axial * Constants.maxCreepSpeed, strafe * Constants.maxCreepSpeed, yaw * Constants.maxCreepSpeed);
     }
 
     public void moveDirection(double axial, double strafe, double yaw) {
@@ -103,18 +96,19 @@ public class DriveTrain {
             rightRearPower /= max;
         }
 
-        leftFrontDrive.setVelocity(leftFrontPower * maxNormalSpeed * maxVelocity);
-        rightFrontDrive.setVelocity(rightFrontPower * maxNormalSpeed * maxVelocity);
-        leftRearDrive.setVelocity(leftRearPower * maxNormalSpeed * maxVelocity);
-        rightRearDrive.setVelocity(rightRearPower * maxNormalSpeed * maxVelocity);
+        leftFrontDrive.setVelocity(leftFrontPower * maxSpeed * Constants.driveTrainMaxVelocity);
+        rightFrontDrive.setVelocity(rightFrontPower * maxSpeed * Constants.driveTrainMaxVelocity);
+        leftRearDrive.setVelocity(leftRearPower * maxSpeed * Constants.driveTrainMaxVelocity);
+        rightRearDrive.setVelocity(rightRearPower * maxSpeed * Constants.driveTrainMaxVelocity);
     }
 
     public void encoderStrafeForDistance(double distance) {
-        int targetCounts = (int) (distance * countsPerInch);
+        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInch);
         int leftFrontTarget = 0;
         int leftRearTarget = 0;
         int rightFrontTarget = 0;
         int rightRearTarget = 0;
+        double strafeSpeed = Constants.maxAutoStrafeSpeed;
 
         leftFrontTarget = leftFrontDrive.getCurrentPosition() + targetCounts;
         leftRearTarget = leftRearDrive.getCurrentPosition() - targetCounts;
@@ -127,25 +121,23 @@ public class DriveTrain {
         rightRearDrive.setTargetPosition(rightRearTarget);
 
         setRunToPosition();
-        leftFrontDrive.setPower(maxNormalSpeed);
-        leftRearDrive.setPower(maxNormalSpeed);
-        rightFrontDrive.setPower(maxNormalSpeed);
-        rightRearDrive.setPower(maxNormalSpeed);
-        while (leftFrontDrive.isBusy() && leftRearDrive.isBusy() && rightFrontDrive.isBusy() && rightRearDrive.isBusy()) {
 
+        while (leftFrontDrive.isBusy() && leftRearDrive.isBusy() && rightFrontDrive.isBusy() && rightRearDrive.isBusy()) {
+            moveDirection(0, strafeSpeed, 0);
         }
+        stop();
         setRunUsingEncoder();
     }
 
     public void moveStraightForDistance(double distance) {
-        int targetCounts = (int) (distance * countsPerInch);
+        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInch);
         int leftFrontTarget = 0;
         int leftRearTarget = 0;
         int rightFrontTarget = 0;
         int rightRearTarget = 0;
         double headingError = 0;
-        double turnSpeed = maxCorrectionTurnSpeed;
-        double driveSpeed = maxCorrectionDriveSpeed;
+        double turnSpeed = Constants.maxAutoCorrectionTurnSpeed;
+        double driveSpeed = Constants.maxAutoCorrectionDriveSpeed;
         double targetHeading = getHeading();
 
         leftFrontTarget = leftFrontDrive.getCurrentPosition() + targetCounts;
@@ -164,7 +156,7 @@ public class DriveTrain {
             //while (leftFrontDrive.isBusy()) {
             headingError = getHeadingError(targetHeading);
             // Determine required steering to keep on heading
-            turnSpeed = getSteeringCorrection(headingError, driveGain);
+            turnSpeed = getSteeringCorrection(headingError, Constants.autoDriveGain);
 
             // if driving in reverse, the motor correction also needs to be reversed
             if (distance < 0)
@@ -173,7 +165,6 @@ public class DriveTrain {
             // Apply the turning correction to the current driving speed.
             moveDirection(driveSpeed, 0.0, turnSpeed);
         }
-
         stop();
         setRunUsingEncoder();
     }

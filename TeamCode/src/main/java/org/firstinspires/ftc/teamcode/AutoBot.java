@@ -19,13 +19,13 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public abstract class AutoBot extends Bot {
+public class AutoBot extends Bot {
     private AprilTagProcessor aprilTagProcessor = null;
     private VisionPortal visionPortal = null;
     protected Rev2mDistanceSensor distanceSensor = null;
 
     public AutoBot(LinearOpMode opMode) {
-        super(opMode);
+        super(opMode, Constants.maxAutoSpeed);
         distanceSensor = opMode.hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
     }
 
@@ -39,12 +39,6 @@ public abstract class AutoBot extends Bot {
         double axialPower = 0;
         double strafePower = 0;
         double yawPower = 0;
-        final double axialGain = 0.02;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
-        final double strafeGain = 0.01;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
-        final double yawGain = 0.01;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
-        final double maxAxial = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
-        final double maxStrafe = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
-        final double maxYaw = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
         double scanAngle = 2;
         final double maxTotalAngle = 15;
         final double minTotalAngle = -15;
@@ -52,18 +46,18 @@ public abstract class AutoBot extends Bot {
 
         initAprilTag();
 
-        setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
+        setManualExposure(Constants.atExposureMS, Constants.atExposureGain);  // Use low exposure time to reduce motion blur
 
         while (axialError > axialErrorThreshold) {
             targetFound = false;
             targetTag = null;
 
-            // Step through the list of detected tags and look for a matching tag
+            // Search through detected tags to find the target tag
             List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
             for (AprilTagDetection detection : currentDetections) {
-                // Look to see if we have size info on this tag.
+                // Look to see if we have size info on this tag
                 if (detection.metadata != null) {
-                    //  Check to see if we want to track towards this tag.
+                    //  Check to see if we want to track towards this tag
                     if (detection.id == targetTagNumber) {
                         // Yes, we want to use this tag.
                         targetFound = true;
@@ -81,7 +75,6 @@ public abstract class AutoBot extends Bot {
 
             // Tell the driver what we see, and what to do.
             if (targetFound) {
-                opMode.telemetry.addData("\n>", "HOLD Left-Bumper to Drive to Target\n");
                 opMode.telemetry.addData("Found", "ID %d (%s)", targetTag.id, targetTag.metadata.name);
                 opMode.telemetry.addData("Range", "%5.1f inches", targetTag.ftcPose.range);
                 opMode.telemetry.addData("Bearing", "%3.0f degrees", targetTag.ftcPose.bearing);
@@ -96,9 +89,9 @@ public abstract class AutoBot extends Bot {
                 yawError = targetTag.ftcPose.yaw;
 
                 // Use the speed and turn "gains" to calculate how we want the robot to move.
-                axialPower = Range.clip(axialError * axialGain, -maxAxial, maxAxial);
-                yawPower = Range.clip(strafeError * yawGain, -maxYaw, maxYaw);
-                strafePower = Range.clip(-yawError * strafeGain, -maxStrafe, maxStrafe);
+                axialPower = Range.clip(axialError * Constants.atAxialGain, -Constants.atMaxAxial, Constants.atMaxAxial);
+                yawPower = Range.clip(strafeError * Constants.atYawGain, -Constants.atMaxYaw, Constants.atMaxYaw);
+                strafePower = Range.clip(-yawError * Constants.atStrafeGain, -Constants.atMaxStrafe, Constants.atMaxStrafe);
 
                 opMode.telemetry.addData("Auto", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", axialPower, strafePower, yawPower);
             } else {
@@ -111,108 +104,32 @@ public abstract class AutoBot extends Bot {
                 axialPower = 0.0;
                 strafePower = 0.0;
                 yawPower = 0.0;
-                opMode.telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", axialPower, strafePower, yawPower);
+                opMode.telemetry.addData("Scanning Angle:", "%4.12f", scanAngle);
             }
             opMode.telemetry.update();
 
             // Apply desired axes motions to the drivetrain.
             driveTrain.moveDirection(axialPower, strafePower, yawPower);
             opMode.sleep(10);
-
         }
     }
 
-    // Scan for prop in one of three positions
-    // Return position 1, 2, or 3 (left, right, or center)
-    public int dsPlacePurplePixel() {
-        final double propDistanceThreshold = 10;
-        final int position1Heading = -270;
-        final int position2Heading = 0;
-        final int position3Heading = -90;
-        final double placementDistanceOffset = 5.5;
-        double objectDistance = 0;
-
-        final double position1StrafeDistance = 3;
-        final double position2StrafeDistance = 3.5;
-        final double position3StrafeDistance = 12;
-        double strafeDistance = 0;
-
-        int objectPosition = 3;
-        boolean objectFound = false;
-
-        strafeDistance = position2StrafeDistance;
-        turnToHeading(position2Heading);
-        strafeForDistance(-strafeDistance);
-        objectDistance = distanceSensor.getDistance(DistanceUnit.INCH);
-        if (objectDistance < propDistanceThreshold) {
-            objectFound = true;
-            objectPosition = 2;
-        }
-        if (!objectFound) {
-            strafeForDistance(strafeDistance);
-            strafeDistance = position3StrafeDistance;
-            turnToHeading(position3Heading);
-            strafeForDistance(-strafeDistance);
-            objectDistance = distanceSensor.getDistance(DistanceUnit.INCH);
-            if (objectDistance < propDistanceThreshold) {
-                objectFound = true;
-                objectPosition = 3;
-            } else {
-                objectFound = true;
-                objectPosition = 1;
-                strafeForDistance(strafeDistance);
-                turnToHeading(position1Heading);
-                strafeDistance = -position1StrafeDistance;
-                strafeForDistance(-strafeDistance);
-            }
-        }
-        objectDistance = distanceSensor.getDistance(DistanceUnit.INCH);
-        moveStraightForDistance(placementDistanceOffset + objectDistance);
-        moveStraightForDistance(-placementDistanceOffset - objectDistance);
-        strafeForDistance(strafeDistance);
-
-        return (objectPosition);
+    public double getDistance() {
+        return distanceSensor.getDistance(DistanceUnit.INCH);
     }
 
     public void moveStraightToObject(double targetDistance) {
+//        double distance = 12;
         double objectDistance = distanceSensor.getDistance(DistanceUnit.INCH);
-        moveStraightForDistance(objectDistance - targetDistance);
-    }
-
-    public void setToCruisingPosition() {
-        wristUp();
-        grabberClose();
-        liftStopAtPosition(550);
-    }
-
-    public void escapeSquare(int propPosition) {
-
-        turnToHeading(-90);
-        if (propPosition == 2) {
-            moveStraightForDistance(24);
-            strafeForDistance(-24);
-        } else {
-            strafeForDistance(-24);
-            moveStraightForDistance(24);
-        }
-
-    }
-
-    public void moveToCenterOfSquare() {
-        moveStraightForDistance(25);
-    }
-
-    public void moveStraightAndPark() {
-        moveStraightToObject(16);
-        turnToHeading(0);
-        strafeForDistance(12);
-        stopDrive();
-    }
-
-    public void setStationaryPosition() {
-        wristDown();
-        grabberOpen();
-        liftStopAtPosition(0);
+        opMode.telemetry.addData("Distance: ", objectDistance);
+        opMode.telemetry.update();
+        opMode.sleep(3000);
+//        if (objectDistance < targetDistance) {
+//            distance = objectDistance;
+//        } else {
+//            distance = objectDistance - targetDistance;
+//        }
+        moveStraightForDistance(objectDistance-targetDistance);
     }
 
     private void initAprilTag() {
@@ -228,20 +145,16 @@ public abstract class AutoBot extends Bot {
         // Note: Decimation can be changed on-the-fly to adapt during a match.
         aprilTagProcessor.setDecimation(2);
 
-
         visionPortal = new VisionPortal.Builder()
                 .setCamera(opMode.hardwareMap.get(WebcamName.class, "Webcam 1"))
                 .addProcessor(aprilTagProcessor)
                 .build();
     }
 
-
     //   Manually set the camera gain and exposure.
     //   This can only be called AFTER calling initAprilTag(), and only works for Webcams;
-
     private void setManualExposure(int exposureMS, int gain) {
         // Wait for the camera to be open, then use the controls
-
         if (visionPortal == null) {
             return;
         }
@@ -272,5 +185,3 @@ public abstract class AutoBot extends Bot {
         }
     }
 }
-
-

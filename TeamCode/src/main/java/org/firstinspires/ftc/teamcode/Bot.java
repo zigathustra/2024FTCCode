@@ -43,11 +43,13 @@ public class Bot {
     protected double grabberClosedPosition = 0.4;
     protected double grabberOpenPosition = 1.5;
     protected LinearOpMode opMode = null;
+    protected double maxSpeed = Constants.maxNormalSpeed; // Default speed. Reassigned in the constructor.
 
-    public Bot(LinearOpMode opMode) {
+    public Bot(LinearOpMode opMode, double maxSpeed) {
         this.opMode = opMode;
+        this.maxSpeed = maxSpeed;
 
-        driveTrain = new DriveTrain(opMode);
+        driveTrain = new DriveTrain(opMode, maxSpeed);
 
         lift = new Lift(opMode);
 
