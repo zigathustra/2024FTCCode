@@ -63,7 +63,7 @@ public class Lift {
     private boolean stoppedAtBottom() {
         boolean stop = false;
         int currentPosition = liftMotor.getCurrentPosition();
-        if (currentPosition < (Constants.liftMinPosition - Constants.liftminTolerance)) {
+        if (currentPosition < (Constants.liftMinPosition - Constants.liftMinTolerance)) {
             stop = true;
             stopAtPosition(Constants.liftMinPosition);
         }

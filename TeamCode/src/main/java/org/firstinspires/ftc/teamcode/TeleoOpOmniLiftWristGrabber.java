@@ -31,7 +31,10 @@ public class TeleoOpOmniLiftWristGrabber extends LinearOpMode {
                 driveAxial = gamepad1.left_stick_y;
                 driveStrafe = gamepad1.left_stick_x;
                 driveYaw = gamepad1.right_stick_x;
-                bot.moveDirection(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
+                if ((Math.abs(driveAxial) < 0.3) && (Math.abs(driveStrafe) < 0.3) && (Math.abs(driveYaw) < 0.3)) {
+                    bot.stopDrive();
+                } else
+                    bot.moveDirection(-driveAxial, -driveStrafe, -driveYaw);
             }
 
             leftTrigger = gamepad1.left_trigger;
