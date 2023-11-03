@@ -32,9 +32,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class Bot {
+public class TeleOpBot9800 {
     // Attributes for hardware
-    protected DriveTrain driveTrain = null;
+    protected DriveTrain9800 driveTrain = null;
     protected Lift lift = null;
     protected Servo wrist = null;
     protected double wristDownPosition = 0.4;
@@ -46,19 +46,20 @@ public class Bot {
     protected LinearOpMode opMode = null;
     protected double maxSpeed = Constants.maxNormalSpeed; // Default speed. Reassigned in the constructor.
 
-    public Bot(LinearOpMode opMode, double maxSpeed) {
+    public TeleOpBot9800(LinearOpMode opMode) {
         this.opMode = opMode;
-        this.maxSpeed = maxSpeed;
+        this.opMode = opMode;
+        this.maxSpeed = Constants.maxNormalSpeed;
 
-        driveTrain = new DriveTrain(opMode, maxSpeed);
+        driveTrain = new DriveTrain9800(opMode, maxSpeed);
 
         lift = new Lift(opMode);
 
-        wrist = opMode.hardwareMap.get(Servo.class, "wrist");
-        wrist.setPosition(wristDownPosition);
+//        wrist = opMode.hardwareMap.get(Servo.class, "wrist");
+//        wrist.setPosition(wristDownPosition);
 
-        grabber = opMode.hardwareMap.get(Servo.class, "grabber");
-        grabber.setPosition(grabberClosedPosition);
+//        grabber = opMode.hardwareMap.get(Servo.class, "grabber");
+//        grabber.setPosition(grabberClosedPosition);
 
     }
 
@@ -111,7 +112,7 @@ public class Bot {
     public void liftStopAtPosition(int position) {
         lift.stopAtPosition(position);
     }
-
+/*
     public void wristUp() {
         wrist.setPosition(wristUpPosition);
     }
@@ -129,6 +130,7 @@ public class Bot {
     public void grabberClose() {
         grabber.setPosition(grabberClosedPosition);
     }
+    */
 }
 
 

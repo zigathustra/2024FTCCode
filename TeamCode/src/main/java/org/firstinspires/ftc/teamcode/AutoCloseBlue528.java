@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "AutoCloseBlue528", group = "Autonomous")
+@Autonomous(name = "AutoCloseBlue528", group = "Autonomous")
 public class AutoCloseBlue528 extends AutoMaster {
     public AutoCloseBlue528() {
         super(2);

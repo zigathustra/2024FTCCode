@@ -2,18 +2,14 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-public class DriveTrain {
+public class DriveTrain9800 {
     private DcMotorEx leftFrontDrive = null;
     private DcMotorEx rightFrontDrive = null;
     private DcMotorEx leftRearDrive = null;
@@ -22,7 +18,7 @@ public class DriveTrain {
     private IMU imu = null;
     LinearOpMode opMode = null;
 
-    public DriveTrain(LinearOpMode opMode, double maxSpeed) {
+    public DriveTrain9800(LinearOpMode opMode, double maxSpeed) {
         this.opMode = opMode;
         this.maxSpeed = maxSpeed;
         leftFrontDrive = opMode.hardwareMap.get(DcMotorEx.class, "left_front_drive");
@@ -30,9 +26,9 @@ public class DriveTrain {
         rightFrontDrive = opMode.hardwareMap.get(DcMotorEx.class, "right_front_drive");
         rightRearDrive = opMode.hardwareMap.get(DcMotorEx.class, "right_rear_drive");
 
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightRearDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightRearDrive.setDirection(DcMotor.Direction.REVERSE);
 
         stopAndResetEncoders();
@@ -96,14 +92,14 @@ public class DriveTrain {
             rightRearPower /= max;
         }
 
-        leftFrontDrive.setVelocity(leftFrontPower * maxSpeed * Constants.driveTrainMaxVelocity15);
-        rightFrontDrive.setVelocity(rightFrontPower * maxSpeed * Constants.driveTrainMaxVelocity15);
-        leftRearDrive.setVelocity(leftRearPower * maxSpeed * Constants.driveTrainMaxVelocity15);
-        rightRearDrive.setVelocity(rightRearPower * maxSpeed * Constants.driveTrainMaxVelocity15);
+        leftFrontDrive.setVelocity(leftFrontPower * maxSpeed * Constants.driveTrainMaxVelocity20);
+        rightFrontDrive.setVelocity(rightFrontPower * maxSpeed * Constants.driveTrainMaxVelocity20);
+        leftRearDrive.setVelocity(leftRearPower * maxSpeed * Constants.driveTrainMaxVelocity20);
+        rightRearDrive.setVelocity(rightRearPower * maxSpeed * Constants.driveTrainMaxVelocity20);
     }
 
     public void encoderStrafeForDistance(double distance) {
-        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInch15);
+        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInch20);
         int leftFrontTarget = 0;
         int leftRearTarget = 0;
         int rightFrontTarget = 0;
@@ -130,7 +126,7 @@ public class DriveTrain {
     }
 
     public void moveStraightForDistance(double distance) {
-        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInch15);
+        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInch20);
         int leftFrontTarget = 0;
         int leftRearTarget = 0;
         int rightFrontTarget = 0;

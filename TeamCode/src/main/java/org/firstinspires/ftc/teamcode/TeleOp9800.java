@@ -3,9 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "TeleoOpOmniLiftWristGrabber", group = "Linear OpMode")
-public class TeleoOpOmniLiftWristGrabber extends LinearOpMode {
-    private TeleOpBot bot = null;
+@TeleOp(name = "TeleOp9800", group = "Linear OpMode")
+public class TeleOp9800 extends LinearOpMode {
+    private TeleOpBot9800 bot = null;
 
     @Override
     public void runOpMode() {
@@ -15,8 +15,8 @@ public class TeleoOpOmniLiftWristGrabber extends LinearOpMode {
         double leftTrigger = 0.0;
         double rightTrigger = 0.0;
 
-        bot = new TeleOpBot(this);
-        bot.wristMiddle();
+        bot = new TeleOpBot9800(this);
+        //bot.wristMiddle();
         waitForStart();
 
         while (opModeIsActive()) {
@@ -47,7 +47,7 @@ public class TeleoOpOmniLiftWristGrabber extends LinearOpMode {
             } else {
                 bot.liftStop();
             }
-
+/*
             if (gamepad1.x) {
                 bot.grabberClose();
             } else if (gamepad1.a) {
@@ -59,7 +59,7 @@ public class TeleoOpOmniLiftWristGrabber extends LinearOpMode {
             } else if (gamepad1.y) {
                 bot.wristDown();
             }
-
+*/
         }
     }
 }

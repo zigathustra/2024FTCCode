@@ -48,13 +48,15 @@ public abstract class AutoMaster extends LinearOpMode {
 
         // Leave the spike mark square and move to a square that faces the parking position
         escapeSquare();
-//        telemetry.addData("escaped", direction);
+//        telemetry.addData("escaped", allianceDirection);
 //        telemetry.update();
 //        sleep(3000);
 
         // Move straight until close to the wall, turn, and parallel park
         moveStraightAndPark();
-
+//        telemetry.addData("parked", allianceDirection);
+//        telemetry.update();
+//        sleep(3000);
         // Lower lift, lower wrist, open grabber
         setStationaryPosition();
     }
@@ -68,12 +70,12 @@ public abstract class AutoMaster extends LinearOpMode {
     // Scan for prop in one of three positions
     // Return position 1, 2, or 3 (far from board, middle, close to board)
     protected void dsPlacePurplePixel() {
+        boolean objectFound = false;
         double objectDistance = 0;
         double strafeDistance = 0;
         Position objectPosition = Position.NEAR; // Default position
         double straightDistance = 0;
 
-        double middleHeading = Constants.dsMiddlePositionHeading;
         double nearHeading = Constants.dsRightPositionHeading;
         double farHeading = Constants.dsLeftPositionHeading;
 
@@ -81,56 +83,77 @@ public abstract class AutoMaster extends LinearOpMode {
         double nearStrafeDistance = Constants.dsRightPositionStrafeDistance;
         double farStrafeDistance1 = Constants.dsLeftPositionStrafeDistance;
         double farStrafeDistance2 = 0;
-        double straightDistance1 = 10;
-        double straightDistance2 = 8;
+        double farDistance1 = 10;
+        double farDistance2 = 8;
         double defaultObjectDistance = 5;
 
         if (alliance == 2) {
-            middleHeading = Constants.dsMiddlePositionHeading;
-            nearStrafeDistance = Constants.dsLeftPositionStrafeDistance;
+            nearStrafeDistance = Constants.dsLeftPositionStrafeDistance + 1.5;
             farStrafeDistance1 = Constants.dsRightPositionStrafeDistance;
             farStrafeDistance2 = 6;
         }
 
-        strafeDistance = middleStrafeDistance;
-        bot.strafeForDistance(-strafeDistance);
+        // Scan for middle position
+        bot.strafeForDistance(-middleStrafeDistance);
         objectDistance = bot.getDistance();
         if (objectDistance < Constants.dsPropDistanceThreshold) {
+            objectFound = true;
             objectPosition = Position.MIDDLE;
-        } else {
-            bot.strafeForDistance(strafeDistance);
-            bot.turnToHeading(allianceDirection*nearHeading);
-            strafeDistance = allianceDirection*nearStrafeDistance;
-            bot.strafeForDistance(-strafeDistance);
+            placePixel(objectDistance);
+        }
+        bot.strafeForDistance(middleStrafeDistance);
+
+        // Scan for near position
+        if (!objectFound) {
+            bot.turnToHeading(allianceDirection * nearHeading);
+            bot.strafeForDistance(-(allianceDirection*nearStrafeDistance));
             objectDistance = bot.getDistance();
             if (objectDistance < Constants.dsPropDistanceThreshold) {
+                objectFound = true;
                 objectPosition = Position.NEAR;
-            } else {
-                objectPosition = Position.FAR;
-                bot.moveStraightForDistance(straightDistance1);
-                bot.strafeForDistance(strafeDistance);
-                bot.turnToHeading(allianceDirection*farHeading);
-                strafeDistance = farStrafeDistance1;
-                bot.strafeForDistance(-strafeDistance);
-                straightDistance = straightDistance2;
-                bot.moveStraightForDistance(straightDistance);
+                placePixel(objectDistance);
             }
+            bot.strafeForDistance(allianceDirection*nearStrafeDistance);
         }
-        objectDistance = bot.getDistance();
-        if ((objectDistance > 14) || (objectDistance < 2)) {
-            objectDistance = defaultObjectDistance;
+
+        // If object not yet found, assumed far position
+        if (!objectFound) {
+            objectFound = true;
+            objectPosition = Position.FAR;
+            bot.moveStraightForDistance(farDistance1);
+            bot.turnToHeading(allianceDirection * farHeading);
+            bot.strafeForDistance(allianceDirection * farStrafeDistance1);
+            bot.moveStraightForDistance(farDistance2);
+            objectDistance = validateDistance(2, 14, bot.getDistance(), defaultObjectDistance);
+            bot.strafeForDistance(farStrafeDistance2);
+//            telemetry.addData("sd1", farStrafeDistance1);
+//            telemetry.addData("sd2", farStrafeDistance2);
+//            telemetry.addData("od", objectDistance);
+//            telemetry.update();
+//                    sleep(5000);
+            placePixel(objectDistance);
+            bot.moveStraightForDistance(-farDistance2);
+//            bot.strafeForDistance(-(allianceDirection * farStrafeDistance1));
+//            bot.strafeForDistance(-farStrafeDistance2);
         }
-        bot.strafeForDistance(farStrafeDistance2);
-        bot.moveStraightForDistance(Constants.dsPlacementDistanceOffset + objectDistance);
-        bot.moveStraightForDistance(-Constants.dsPlacementDistanceOffset - objectDistance);
-        bot.moveStraightForDistance(-straightDistance);
-        bot.strafeForDistance(strafeDistance-farStrafeDistance2);
         propPosition = objectPosition;
     }
 
+    protected double validateDistance(double min, double max, double objectDistance, double defaultDistance) {
+        if ((objectDistance > max) || (objectDistance < min)) {
+            return (defaultDistance);
+        }
+        return (objectDistance);
+    }
+
+    protected void placePixel(double objectDistance) {
+        bot.moveStraightForDistance(Constants.dsPlacementDistanceOffset + objectDistance);
+        bot.moveStraightForDistance(-Constants.dsPlacementDistanceOffset - objectDistance);
+    }
+
     protected void escapeSquare() {
-        double moveDistance = 28;
-        double strafeDistance = 25;
+        double moveDistance = 26;
+        double strafeDistance = 27;
         double farStraightDistance = 4;
         double boardHeading = allianceDirection * Constants.dsRightPositionHeading;
 
@@ -143,8 +166,8 @@ public abstract class AutoMaster extends LinearOpMode {
         if (propPosition == Position.FAR) {
             bot.moveStraightForDistance(-farStraightDistance);
             bot.turnToHeading(boardHeading);
-            bot.moveStraightForDistance(moveDistance - 16);
-            bot.strafeForDistance(-(allianceDirection * strafeDistance));
+            bot.moveStraightForDistance(moveDistance - 12);
+            bot.strafeForDistance(-(allianceDirection * (strafeDistance - 8)));
         } else {
             if (propPosition == Position.NEAR) {
                 bot.strafeForDistance(-(allianceDirection * strafeDistance));
@@ -162,7 +185,6 @@ public abstract class AutoMaster extends LinearOpMode {
     }
 
     protected void moveStraightAndPark() {
-//        bot.moveStraightToObject(15);
         double strafeDistance = allianceDirection * 12;
         bot.moveStraightForDistance(9);
         bot.turnToHeading(0);

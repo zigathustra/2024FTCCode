@@ -2,16 +2,19 @@ package org.firstinspires.ftc.teamcode;
 
 public class Constants {
     // Drivetrain Settings
-    static final double driveTrainMaxVelocity = RevUltra20DcMotorData.maxCountsPerSec;
-    static final double driveTrainCountsPerInch = RevUltra20DcMotorData.countsPerInch;
+    static final double driveTrainMaxVelocity15 = RevUltra15DcMotorData.maxCountsPerSec;
+    static final double driveTrainCountsPerInch15 = RevUltra15DcMotorData.countsPerInch;
+    static final double driveTrainMaxVelocity20 = RevUltra20DcMotorData.maxCountsPerSec;
+    static final double driveTrainCountsPerInch20 = RevUltra20DcMotorData.countsPerInch;
+
     static final double maxNormalSpeed = 0.8;
     static final double maxCreepSpeed = 0.15;
-    static final double maxAutoSpeed = 0.4;
+    static final double maxAutoSpeed = 0.5;
     static final double autoTurnGain = 0.02;   // Larger is more responsive, but also less stable
     static final double autoDriveGain = 0.03;
-    static final double maxAutoStrafeSpeed = 0.4;
-    static final double maxAutoCorrectionDriveSpeed = 0.4; // Max driving speed for better distance accuracy
-    static final double maxAutoCorrectionTurnSpeed = 0.4;// Max Turn speed to limit turn rate
+    static final double maxAutoStrafeSpeed = 0.5;
+    static final double maxAutoCorrectionDriveSpeed = 0.5; // Max driving speed for better distance accuracy
+    static final double maxAutoCorrectionTurnSpeed = 0.5;// Max Turn speed to limit turn rate
     static final double autoHeadingThreshold = 1.0;   // How close the heading must be to the target
 
     // Lift Settings

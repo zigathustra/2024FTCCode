@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-public class RevUltra20DcMotorData {
+public class RevUltra15DcMotorData {
 
     public static double countsPerMotorRev = 28;
-    public static double gearRatio = 20.0;
+    public static double gearRatio = 5.23 * 2.89;
     public static double countsPerGearboxRev = gearRatio * countsPerMotorRev;
     public static double wheelDiameterInches = 75.0/25.4;
     public static double wheelCircumferenceInches = wheelDiameterInches * Math.PI;
