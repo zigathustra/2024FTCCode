@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 enum Position {NEAR, MIDDLE, FAR};
 
 public abstract class AutoMaster extends LinearOpMode {
-    protected AutoBot bot = null;
+    protected Bot bot = null;
     protected int alliance = 0;   // 1=Red, 2=Blue
     protected Position propPosition = Position.NEAR;
     protected int targetAprilTagNumber = 0;
@@ -35,7 +35,7 @@ public abstract class AutoMaster extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        bot = new AutoBot(this);
+        bot = new Bot(this);
         if (alliance == 2) {
             allianceDirection = -1;
         } else {

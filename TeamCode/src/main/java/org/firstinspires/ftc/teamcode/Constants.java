@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.Servo;
+
 public class Constants {
     // Drivetrain Settings
     static final double driveTrainMaxVelocity15 = RevUltra15DcMotorData.maxCountsPerSec;
@@ -25,6 +27,14 @@ public class Constants {
     static final int liftMaxTolerance = 25;
     static final int liftMinPosition = 0;
     static final int liftMinTolerance = 25;
+
+    // Wrist settings
+    static final double wristDownPosition = 0.4;
+    static final double wristMiddlePosition = 0.55;
+    static final double wristUpPosition = 0.75;
+    // Grabber settings
+    static final double grabberClosedPosition = 0.4;
+    static final double grabberOpenPosition = 1.5;
 
     // Prop Detection Settings
     static final double dsPropDistanceThreshold = 12;

@@ -37,12 +37,8 @@ public class Bot {
     protected DriveTrain driveTrain = null;
     protected Lift lift = null;
     protected Servo wrist = null;
-    protected double wristDownPosition = 0.4;
-    protected double wristMiddlePosition = 0.55;
-    protected double wristUpPosition = 0.75;
     protected Servo grabber = null;
-    protected double grabberClosedPosition = 0.4;
-    protected double grabberOpenPosition = 1.5;
+    protected Rev2mDistanceSensor distanceSensor = null;
     protected LinearOpMode opMode = null;
     protected double maxSpeed = Constants.maxNormalSpeed; // Default speed. Reassigned in the constructor.
 
@@ -55,15 +51,17 @@ public class Bot {
         lift = new Lift(opMode);
 
         wrist = opMode.hardwareMap.get(Servo.class, "wrist");
-        wrist.setPosition(wristDownPosition);
+        wrist.setPosition(Constants.wristDownPosition);
 
         grabber = opMode.hardwareMap.get(Servo.class, "grabber");
-        grabber.setPosition(grabberClosedPosition);
+        grabber.setPosition(Constants.grabberClosedPosition);
 
+        distanceSensor = opMode.hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
     }
-    
-    public void setRunWithoutEncoders(){driveTrain.setRunWithoutEncoders();}
-    
+
+    public void setRunWithoutEncoders() {
+        driveTrain.setRunWithoutEncoders();
+    }
 
     // Turn to a specified heading in degrees
     // 0 is straight ahead
@@ -81,12 +79,12 @@ public class Bot {
     public void moveDirection(double axial, double strafe, double yaw) {
         driveTrain.moveDirection(axial, strafe, yaw);
     }
-    
-    
+
+
     public void moveDirectionNoEnc(double axial, double strafe, double yaw) {
         driveTrain.moveDirection(axial, strafe, yaw);
     }
-    
+
     public void creepDirection(double axial, double strafe, double yaw) {
         driveTrain.creepDirection(axial, strafe, yaw);
     }
@@ -94,12 +92,14 @@ public class Bot {
     public void creepDirectionNoEnc(double axial, double strafe, double yaw) {
         driveTrain.creepDirectionNoEnc(axial, strafe, yaw);
     }
-    
+
     public void creepStraightForDistance(double distance) {
         driveTrain.creepStraightForDistance(distance);
     }
 
-    public creepUntilCont    
+    public void creepUntilContact() {
+    }
+
     // Move straight for a specified distance in inches
     public void moveStraightForDistance(double distance) {
         driveTrain.moveStraightForDistance(distance);
@@ -130,21 +130,26 @@ public class Bot {
     }
 
     public void wristUp() {
-        wrist.setPosition(wristUpPosition);
+        wrist.setPosition(Constants.wristUpPosition);
     }
+
     public void wristMiddle() {
-        wrist.setPosition(wristMiddlePosition);
+        wrist.setPosition(Constants.wristMiddlePosition);
     }
+
     public void wristDown() {
-        wrist.setPosition(wristDownPosition);
+        wrist.setPosition(Constants.wristDownPosition);
     }
 
     public void grabberOpen() {
-        grabber.setPosition(grabberOpenPosition);
+        grabber.setPosition(Constants.grabberOpenPosition);
     }
 
     public void grabberClose() {
-        grabber.setPosition(grabberClosedPosition);
+        grabber.setPosition(Constants.grabberClosedPosition);
+    }
+    public double getDistance() {
+        return distanceSensor.getDistance(DistanceUnit.INCH);
     }
 }
 
