@@ -76,7 +76,10 @@ public class DriveTrain {
     public void creepDirection(double axial, double strafe, double yaw) {
         moveDirection(axial * Constants.maxCreepSpeed, strafe * Constants.maxCreepSpeed, yaw * Constants.maxCreepSpeed);
     }
-
+    
+    public void creepDirectionNoEnc(double axial, double strafe, double yaw) {
+        moveDirectionNoEnc(axial * Constants.maxCreepSpeed, strafe * Constants.maxCreepSpeed, yaw * Constants.maxCreepSpeed);
+    }
     public void moveDirection(double axial, double strafe, double yaw) {
         // Calculate wheel powers.
         double leftFrontPower = axial - strafe - yaw;
@@ -100,6 +103,31 @@ public class DriveTrain {
         rightFrontDrive.setVelocity(rightFrontPower * maxSpeed * Constants.driveTrainMaxVelocity15);
         leftRearDrive.setVelocity(leftRearPower * maxSpeed * Constants.driveTrainMaxVelocity15);
         rightRearDrive.setVelocity(rightRearPower * maxSpeed * Constants.driveTrainMaxVelocity15);
+    }
+
+    public void moveDirectionNoEnc(double axial, double strafe, double yaw) {
+        // Calculate wheel powers.
+        double leftFrontPower = axial - strafe - yaw;
+        double rightFrontPower = axial + strafe + yaw;
+        double leftRearPower = axial + strafe - yaw;
+        double rightRearPower = axial - strafe + yaw;
+
+        // Normalize wheel powers to be less than 1.0
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftRearPower));
+        max = Math.max(max, Math.abs(rightRearPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftRearPower /= max;
+            rightRearPower /= max;
+        }
+
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftRearDrive.setPower(leftRearPower);
+        rightRearDrive.setPower(rightRearPower);
     }
 
     public void encoderStrafeForDistance(double distance) {
@@ -129,15 +157,21 @@ public class DriveTrain {
         setRunUsingEncoder();
     }
 
-    public void moveStraightForDistance(double distance) {
+    public void moveStraightForDistance(double distance)
+    {
+        moveStraightForDistance(distance, Constants.maxAutoCorrectionTurnSpeed, Constants.maxAutoCorrectionDriveSpeed);
+    }
+    public void creepStraightForDistance(double distance)
+    {
+        moveStraightForDistance(distance, Constants.maxCreepSpeed, Constants.maxCreepSpeed);
+    }
+    private void moveStraightForDistance(double distance, double turnSpeed, double driveSpeed) {
         int targetCounts = (int) (distance * Constants.driveTrainCountsPerInch15);
         int leftFrontTarget = 0;
         int leftRearTarget = 0;
         int rightFrontTarget = 0;
         int rightRearTarget = 0;
         double headingError = 0;
-        double turnSpeed = Constants.maxAutoCorrectionTurnSpeed;
-        double driveSpeed = Constants.maxAutoCorrectionDriveSpeed;
         double targetHeading = getHeading();
 
         leftFrontTarget = leftFrontDrive.getCurrentPosition() + targetCounts;
@@ -215,7 +249,14 @@ public class DriveTrain {
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightRearDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
-
+    
+    public void setRunWithoutEncoders() {
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftRearDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightRearDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    
     private void setRunUsingEncoder() {
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftRearDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

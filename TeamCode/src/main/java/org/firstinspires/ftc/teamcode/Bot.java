@@ -61,6 +61,9 @@ public class Bot {
         grabber.setPosition(grabberClosedPosition);
 
     }
+    
+    public void setRunWithoutEncoders(){driveTrain.setRunWithoutEncoders();}
+    
 
     // Turn to a specified heading in degrees
     // 0 is straight ahead
@@ -78,11 +81,25 @@ public class Bot {
     public void moveDirection(double axial, double strafe, double yaw) {
         driveTrain.moveDirection(axial, strafe, yaw);
     }
-
+    
+    
+    public void moveDirectionNoEnc(double axial, double strafe, double yaw) {
+        driveTrain.moveDirection(axial, strafe, yaw);
+    }
+    
     public void creepDirection(double axial, double strafe, double yaw) {
         driveTrain.creepDirection(axial, strafe, yaw);
     }
 
+    public void creepDirectionNoEnc(double axial, double strafe, double yaw) {
+        driveTrain.creepDirectionNoEnc(axial, strafe, yaw);
+    }
+    
+    public void creepStraightForDistance(double distance) {
+        driveTrain.creepStraightForDistance(distance);
+    }
+
+    public creepUntilCont    
     // Move straight for a specified distance in inches
     public void moveStraightForDistance(double distance) {
         driveTrain.moveStraightForDistance(distance);
