@@ -74,14 +74,8 @@ public class Lift {
         liftMotor.setTargetPosition(targetPosition);
         liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         liftMotor.setPower(Constants.liftStopPowerFactor);
-        while (liftMotor.isBusy()){
-        }
+//        while (liftMotor.isBusy()){
+//        }
         brakeOn = true;
-    }
-
-    public void moveToPosition(int targetPosition) {
-        if ((targetPosition < Constants.liftMaxPosition) && (targetPosition > Constants.liftMinPosition)) {
-            stopAtPosition(targetPosition);
-        }
     }
 }

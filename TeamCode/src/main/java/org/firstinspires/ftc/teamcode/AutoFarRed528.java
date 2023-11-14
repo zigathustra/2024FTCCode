@@ -11,7 +11,7 @@ public AutoFarRed528(){
     super(1);
     }
     public void runOpMode() {
-        bot = new AutoBot(this);
+        bot = new Bot(this, Constants.maxAutoSpeed);
         if (alliance == 1) {
             allianceDirection = -1;
         } else {

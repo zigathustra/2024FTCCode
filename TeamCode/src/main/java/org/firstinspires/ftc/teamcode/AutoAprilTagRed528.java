@@ -18,7 +18,7 @@ public AutoAprilTagRed528(){
         double moveFromBoard = 2;
         int boardLiftHeight = 1000;
         
-        bot = new Bot(this);
+        bot = new Bot(this, Constants.maxAutoSpeed);
         if (alliance == 2) {
             allianceDirection = -1;
         } else {

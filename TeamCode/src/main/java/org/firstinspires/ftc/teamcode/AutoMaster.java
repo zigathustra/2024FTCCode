@@ -35,7 +35,7 @@ public abstract class AutoMaster extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        bot = new Bot(this);
+        bot = new Bot(this, Constants.maxAutoSpeed);
         if (alliance == 2) {
             allianceDirection = -1;
         } else {
