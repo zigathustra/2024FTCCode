@@ -4,12 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCaptureSequence;
-
 public class Lift {
-    private DcMotorEx liftMotor = null;
-    private boolean brakeOn = false;
-    private LinearOpMode opMode = null;
+    private final DcMotorEx liftMotor;
+    private LinearOpMode opMode;
 
     public Lift(LinearOpMode opMode) {
         this.opMode = opMode;
@@ -74,8 +71,5 @@ public class Lift {
         liftMotor.setTargetPosition(targetPosition);
         liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         liftMotor.setPower(Constants.liftStopPowerFactor);
-//        while (liftMotor.isBusy()){
-//        }
-        brakeOn = true;
     }
 }

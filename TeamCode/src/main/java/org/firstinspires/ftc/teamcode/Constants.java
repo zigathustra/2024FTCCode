@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.hardware.Servo;
-
 public class Constants {
     // Drivetrain Settings
     static final double driveTrainMaxVelocity15 = RevUltra15DcMotorData.maxCountsPerSec;
@@ -39,7 +37,6 @@ public class Constants {
     // Prop Detection Settings
     static final double dsPropDistanceThreshold = 12;
     static final int dsLeftPositionHeading = 90;
-    static final int dsMiddlePositionHeading = 0;
     static final int dsRightPositionHeading = -90;
     static final double dsPlacementDistanceOffset = 5.5;
     static final double dsLeftPositionStrafeDistance = 4;
@@ -55,4 +52,7 @@ public class Constants {
     static final double atMaxYaw = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
     static final int atExposureMS = 6;
     static final int atExposureGain = 250;
+
+    // Parking Settings
+    static final double distanceBetweenAprilTags = 6;
 }
