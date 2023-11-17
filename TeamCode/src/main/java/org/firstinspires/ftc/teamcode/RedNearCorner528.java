@@ -13,6 +13,11 @@ public class RedNearCorner528 extends AutoMaster {
         return(1);
     }
 
+    protected double boardApproachDistance()
+    {
+        return(2);
+    }
+
     protected void determineTargetAprilTagNumber() {
         if (propPosition == PropPosition.FAR) {
             targetAprilTagNumber = 4;

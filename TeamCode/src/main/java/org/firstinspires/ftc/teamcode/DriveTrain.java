@@ -30,10 +30,10 @@ public class DriveTrain {
         rightFrontDrive = opMode.hardwareMap.get(DcMotorEx.class, "right_front_drive");
         rightRearDrive = opMode.hardwareMap.get(DcMotorEx.class, "right_rear_drive");
 
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightRearDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightRearDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontDrive.setDirection(Constants.drivetrainLeftFrontDirection);
+        rightRearDrive.setDirection(Constants.drivetrainLeftRearDirection);
+        rightFrontDrive.setDirection(Constants.drivetrainRightFrontDirection);
+        rightRearDrive.setDirection(Constants.drivetrainRightRearDirection);
 
         stopAndResetEncoders();
         setRunUsingEncoder();

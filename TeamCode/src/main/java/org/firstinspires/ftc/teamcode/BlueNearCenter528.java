@@ -2,28 +2,28 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "RedNearCenter528", group = "Autonomous")
-public class RedNearCenter528 extends AutoMaster {
-    public RedNearCenter528() {
+@Autonomous(name = "BlueNearCenter528", group = "Autonomous")
+public class BlueNearCenter528 extends AutoMaster {
+    public BlueNearCenter528() {
         super(BotPosition.RED_NEAR, ParkPosition.CENTER);
     }
 
     protected int directionFactor()
     {
-        return(1);
+        return(-1);
     }
 
     protected void determineTargetAprilTagNumber() {
         if (propPosition == PropPosition.FAR) {
-            targetAprilTagNumber = 4;
+            targetAprilTagNumber = 3;
         }
 
         if (propPosition == PropPosition.MIDDLE) {
-            targetAprilTagNumber = 5;
+            targetAprilTagNumber = 2;
         }
 
         if (propPosition == PropPosition.NEAR) {
-            targetAprilTagNumber = 6;
+            targetAprilTagNumber = 1;
         }
     }
     protected double boardApproachDistance()
@@ -32,8 +32,7 @@ public class RedNearCenter528 extends AutoMaster {
     }
     protected double parkStrafeDistance()
     {
-        double slotsFromParkingPosition = targetAprilTagNumber - 3 + 1.5;
+        double slotsFromParkingPosition = 4 - targetAprilTagNumber + 2.5;
         return(directionFactor * (slotsFromParkingPosition * Constants.distanceBetweenAprilTags));
     }
 }
-
