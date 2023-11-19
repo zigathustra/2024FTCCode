@@ -19,6 +19,9 @@ public class DriveTrain {
     private DcMotorEx leftRearDrive = null;
     private DcMotorEx rightRearDrive = null;
     private double maxSpeed = 0.8; // Factor (0.0-1.0) to control drive speed
+    private double maxVelocity = Constants.driveTrainMaxVelocityRev15;
+
+    private double countsPerInch = Constants.driveTrainCountsPerInchRev15;
     private IMU imu = null;
     LinearOpMode opMode = null;
 
@@ -99,10 +102,10 @@ public class DriveTrain {
             rightRearPower /= max;
         }
 
-        leftFrontDrive.setVelocity(leftFrontPower * maxSpeed * Constants.driveTrainMaxVelocity15);
-        rightFrontDrive.setVelocity(rightFrontPower * maxSpeed * Constants.driveTrainMaxVelocity15);
-        leftRearDrive.setVelocity(leftRearPower * maxSpeed * Constants.driveTrainMaxVelocity15);
-        rightRearDrive.setVelocity(rightRearPower * maxSpeed * Constants.driveTrainMaxVelocity15);
+        leftFrontDrive.setVelocity(leftFrontPower * maxSpeed * maxVelocity);
+        rightFrontDrive.setVelocity(rightFrontPower * maxSpeed * maxSpeed * maxVelocity);
+        leftRearDrive.setVelocity(leftRearPower * maxSpeed * maxVelocity);
+        rightRearDrive.setVelocity(rightRearPower * maxSpeed * maxVelocity);
     }
 
     public void moveDirectionNoEnc(double axial, double strafe, double yaw) {
@@ -131,7 +134,7 @@ public class DriveTrain {
     }
 
     public void encoderStrafeForDistance(double distance) {
-        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInch15);
+        int targetCounts = (int) (distance * countsPerInch);
         int leftFrontTarget = 0;
         int leftRearTarget = 0;
         int rightFrontTarget = 0;
@@ -166,7 +169,7 @@ public class DriveTrain {
         moveStraightForDistance(distance, Constants.maxCreepSpeed, Constants.maxCreepSpeed);
     }
     private void moveStraightForDistance(double distance, double turnSpeed, double driveSpeed) {
-        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInch15);
+        int targetCounts = (int) (distance * countsPerInch);
         int leftFrontTarget = 0;
         int leftRearTarget = 0;
         int rightFrontTarget = 0;

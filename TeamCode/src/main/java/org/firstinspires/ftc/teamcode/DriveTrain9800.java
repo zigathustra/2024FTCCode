@@ -92,14 +92,14 @@ public class DriveTrain9800 {
             rightRearPower /= max;
         }
 
-        leftFrontDrive.setVelocity(leftFrontPower * maxSpeed * Constants.driveTrainMaxVelocity20);
-        rightFrontDrive.setVelocity(rightFrontPower * maxSpeed * Constants.driveTrainMaxVelocity20);
-        leftRearDrive.setVelocity(leftRearPower * maxSpeed * Constants.driveTrainMaxVelocity20);
-        rightRearDrive.setVelocity(rightRearPower * maxSpeed * Constants.driveTrainMaxVelocity20);
+        leftFrontDrive.setVelocity(leftFrontPower * maxSpeed * Constants.driveTrainMaxVelocityRev20);
+        rightFrontDrive.setVelocity(rightFrontPower * maxSpeed * Constants.driveTrainMaxVelocityRev20);
+        leftRearDrive.setVelocity(leftRearPower * maxSpeed * Constants.driveTrainMaxVelocityRev20);
+        rightRearDrive.setVelocity(rightRearPower * maxSpeed * Constants.driveTrainMaxVelocityRev20);
     }
 
     public void encoderStrafeForDistance(double distance) {
-        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInch20);
+        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInchRev20);
         int leftFrontTarget = 0;
         int leftRearTarget = 0;
         int rightFrontTarget = 0;
@@ -126,7 +126,7 @@ public class DriveTrain9800 {
     }
 
     public void moveStraightForDistance(double distance) {
-        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInch20);
+        int targetCounts = (int) (distance * Constants.driveTrainCountsPerInchRev20);
         int leftFrontTarget = 0;
         int leftRearTarget = 0;
         int rightFrontTarget = 0;

@@ -6,10 +6,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class Constants {
     // Drivetrain Settings
-    static final double driveTrainMaxVelocity15 = RevUltra15DcMotorData.maxCountsPerSec;
-    static final double driveTrainCountsPerInch15 = RevUltra15DcMotorData.countsPerInch;
-    static final double driveTrainMaxVelocity20 = RevUltra20DcMotorData.maxCountsPerSec;
-    static final double driveTrainCountsPerInch20 = RevUltra20DcMotorData.countsPerInch;
+    static final double driveTrainMaxVelocityRev15 = RevUltra15DcMotorData.maxCountsPerSec;
+    static final double driveTrainCountsPerInchRev15 = RevUltra15DcMotorData.countsPerInch;
+    static final double driveTrainMaxVelocityRev20 = RevUltra20DcMotorData.maxCountsPerSec;
+    static final double driveTrainCountsPerInchRev20 = RevUltra20DcMotorData.countsPerInch;
     static final DcMotor.Direction drivetrainLeftFrontDirection = DcMotor.Direction.FORWARD;
     static final DcMotor.Direction drivetrainLeftRearDirection = DcMotor.Direction.FORWARD;
     static final DcMotor.Direction drivetrainRightFrontDirection = DcMotor.Direction.REVERSE;
