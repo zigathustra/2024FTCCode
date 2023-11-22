@@ -54,13 +54,14 @@ public abstract class AutoMaster extends LinearOpMode {
         // Raise lift, raise wrist, close grabber
         setToCruisingPosition();
 
-        // Move to the center of the spike mark square
-        moveToCenterOfSquare();
+        // Move to the center of the spike marks
+        moveToCenterOfSpikeMarks();
 
         // Determine prop position, and place the purple pixel on the spike mark
         dsPlacePurplePixel();
 
-        // Leave the spike mark square and move to a square that faces the parking position
+        // Leave the spike mark square and move to a tile that faces the parking position
+        // Align camera roughly with appropriate April Tag
         escapeSquare();
 
         determineTargetAprilTagNumber();
@@ -68,21 +69,7 @@ public abstract class AutoMaster extends LinearOpMode {
         // Correct strafe and yaw to directly face the target April Tag
         autoOrientToAprilTag(targetAprilTagNumber);
 
-//        telemetry.addData("Moving for..", boardApproachDistance());
-//        telemetry.update();
-//        sleep(2500);
-
-        bot.moveStraightForDistance(boardApproachDistance());
-        bot.strafeForDistance(-6);
-//        autoOrientToAprilTag(targetAprilTagNumber);
-        bot.liftStopAtPosition(750);
-        bot.creepStraightForDistance(bot.getDistance() - 9);
-//        sleep(500);
-        bot.grabberOpen();
-        bot.moveStraightForDistance(-10);
-
-        // Move to board and place pixel
-        //      placePixelOnBoard();
+        placePixelOnBoard();
 
         // Move straight until close to the wall, turn, and parallel park
         park(parkStrafeDistance());
@@ -105,62 +92,50 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.liftStopAtPosition(550);
     }
 
+    protected void moveToCenterOfSpikeMarks() {
+        bot.moveStraightForDistance(Constants.dsDistanceToCenterOfSpikeMarks);
+    }
+
     // Scan for prop in one of three positions
     // Return position 1, 2, or 3 (far from board, middle, close to board)
     protected void dsPlacePurplePixel() {
-        boolean objectFound = false;
         double objectDistance;
-        PropPosition objectPosition = PropPosition.NEAR; // Default position
-        double nearHeading = Constants.dsRightPositionHeading;
-        double farHeading = Constants.dsLeftPositionHeading;
-        double middleStrafeDistance = Constants.dsMiddlePositionStrafeDistance;
-        double nearStrafeDistance = Constants.dsRightPositionStrafeDistance;
-        double farStrafeDistance1 = Constants.dsLeftPositionStrafeDistance;
-        double farStrafeDistance2 = 0;
-        double farDistance1 = 10;
-        double farDistance2 = 8;
-        double defaultObjectDistance = 3;
-
-        if (directionFactor == -1) {
-            nearStrafeDistance = Constants.dsLeftPositionStrafeDistance - 3.5;
-            farStrafeDistance1 = Constants.dsRightPositionStrafeDistance;
-            farStrafeDistance2 = 10;
-        }
+        PropPosition objectPosition = null;
+        double defaultObjectDistance = (Constants.tileSize/2 - Constants.drivetrainLength/2);
+        double boardHeading = directionFactor * Constants.dsBoardHeading;
+        double middleStrafe = Constants.sensorToDrivetrainMiddle;
+        double nearStrafe = directionFactor * (Constants.spikeMarkSize / 2 + directionFactor * Constants.sensorToDrivetrainMiddle);
+        double farStraight = Constants.drivetrainLength;
+        double farStrafe =  directionFactor * (Constants.sensorToDrivetrainMiddle - Constants.spikeMarkSize / 2);
 
         // Scan for middle position
-        bot.strafeForDistance(-middleStrafeDistance);
+        bot.strafeForDistance(-middleStrafe);
         objectDistance = bot.getDistance();
         if (objectDistance < Constants.dsPropDistanceThreshold) {
-            objectFound = true;
             objectPosition = PropPosition.MIDDLE;
             pushPixel(objectDistance);
         }
-        bot.strafeForDistance(middleStrafeDistance);
-//        bot.moveStraightForDistance((directionFactor * 2.5) - 2.5);
+        bot.strafeForDistance(middleStrafe);
         // Scan for near position
-        if (!objectFound) {
-            bot.turnToHeading(directionFactor * nearHeading);
-            bot.strafeForDistance(-(directionFactor * nearStrafeDistance));
+        if (objectPosition != PropPosition.MIDDLE) {
+            bot.turnToHeading(boardHeading);
+            bot.strafeForDistance(-nearStrafe);
             objectDistance = bot.getDistance();
             if (objectDistance < Constants.dsPropDistanceThreshold) {
-                objectFound = true;
                 objectPosition = PropPosition.NEAR;
                 pushPixel(objectDistance);
             }
-//            bot.strafeForDistance((directionFactor * 4) - 4);
+            bot.strafeForDistance(-nearStrafe);
         }
         // If object not yet found, assumed far position
-        if (!objectFound) {
-            objectFound = true;
+        if (objectPosition != PropPosition.NEAR) {
             objectPosition = PropPosition.FAR;
-            bot.moveStraightForDistance(farDistance1);
-            bot.turnToHeading(directionFactor * farHeading);
-            bot.strafeForDistance(-(directionFactor * farStrafeDistance1));
-            bot.moveStraightForDistance(farDistance2);
-            objectDistance = validateDistance(2, 14, bot.getDistance(), defaultObjectDistance);
-            pushPixel(objectDistance);
-//            bot.strafeForDistance(-(directionFactor * farStrafeDistance2));
-            //            bot.moveStraightForDistance(-farDistance2);
+//            bot.moveStraightForDistance(farStraight);
+            bot.turnToHeading(-boardHeading);
+//            bot.moveStraightForDistance(farStraight);
+            bot.strafeForDistance(-farStrafe);
+            pushPixel(defaultObjectDistance);
+            bot.strafeForDistance(farStrafe);
         }
         propPosition = objectPosition;
     }
@@ -178,6 +153,12 @@ public abstract class AutoMaster extends LinearOpMode {
     }
 
     protected void placePixelOnBoard() {
+        bot.moveStraightForDistance(boardApproachDistance());
+        bot.strafeForDistance(-6);
+        bot.liftStopAtPosition(750);
+        bot.creepStraightForDistance(bot.getDistance() - 9);
+        bot.grabberOpen();
+        bot.moveStraightForDistance(-10);
     }
 
     protected void escapeSquare() {
@@ -187,7 +168,7 @@ public abstract class AutoMaster extends LinearOpMode {
         double farBackwardDistance = 4;
         double nearStrafeDistance = 37;
         double middleStrafeDistance = 0;
-        double boardHeading = directionFactor * Constants.dsRightPositionHeading;
+        double boardHeading = directionFactor * Constants.dsBoardHeading;
 
         if (directionFactor == -1) {
             nearStrafeDistance = 26;
@@ -211,10 +192,6 @@ public abstract class AutoMaster extends LinearOpMode {
                 bot.strafeForDistance(-(directionFactor * middleStrafeDistance));
             }
         }
-    }
-
-    protected void moveToCenterOfSquare() {
-        bot.moveStraightForDistance(25);
     }
 
     protected void park(double parkStrafeDistance) {
