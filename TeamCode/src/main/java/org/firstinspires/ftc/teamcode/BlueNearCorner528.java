@@ -2,38 +2,38 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "RedNearCorner528", group = "Autonomous")
-public class RedNearCorner528 extends AutoMaster {
-    public RedNearCorner528() {
-        super(BotPosition.RED_NEAR);
+@Autonomous(name = "BlueNearCorner528", group = "Autonomous")
+public class BlueNearCorner528 extends AutoMaster {
+    public BlueNearCorner528() {
+        super(BotPosition.BLUE_NEAR);
     }
 
     protected double boardDirectionFactor()
     {
-        return(1);
+        return(-1);
     }
 
     protected double riggingDirectionFactor()
     {
-        return(-1);
+        return(1);
     }
 
     protected int aprilTagNumber(PropPosition propPosition) {
-        int tagNumber =  4;
+        int tagNumber =  6;
 
         if (propPosition == PropPosition.MIDDLE) {
             tagNumber = 5;
         }
 
         if (propPosition == PropPosition.FAR) {
-            tagNumber = 6;
+            tagNumber = 4;
         }
         return(tagNumber);
     }
     protected double parkStrafeVector(int targetAprilTagNumber)
     {
-        double slotsFromParkingPosition = 7 - targetAprilTagNumber + 0.5;
-        return(slotsFromParkingPosition * Constants.distanceBetweenAprilTags + Constants.sensorToDrivetrainMiddle * 2);
+        double slotsFromParkingPosition = targetAprilTagNumber - 3 + .5;
+        return(-(slotsFromParkingPosition * Constants.distanceBetweenAprilTags + Constants.sensorToDrivetrainMiddle * 2));
     }
 }
 

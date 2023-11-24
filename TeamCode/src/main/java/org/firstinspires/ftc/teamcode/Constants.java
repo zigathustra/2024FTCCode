@@ -5,27 +5,29 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class Constants {
-    // Field settings
-    static final double tileSize = 24; // Distance across one tile
-    static final double spikeMarkSize = 12; // Length of spike mark
     // Drivetrain Settings
     static final double drivetrainLength = 14;
-    static final double driveTrainMaxVelocityRev15 = RevUltra15DcMotorData.maxCountsPerSec;
-    static final double driveTrainCountsPerInchRev15 = RevUltra15DcMotorData.countsPerInch;
-    static final double driveTrainMaxVelocityRev20 = RevUltra20DcMotorData.maxCountsPerSec;
-    static final double driveTrainCountsPerInchRev20 = RevUltra20DcMotorData.countsPerInch;
-    static final DcMotor.Direction drivetrainLeftFrontDirection = DcMotor.Direction.FORWARD;
-    static final DcMotor.Direction drivetrainLeftRearDirection = DcMotor.Direction.FORWARD;
-    static final DcMotor.Direction drivetrainRightFrontDirection = DcMotor.Direction.REVERSE;
-    static final DcMotor.Direction drivetrainRightRearDirection = DcMotor.Direction.REVERSE;
+    static final double distanceBetweenSensors = 8.75;
+    static double sensorToDrivetrainMiddle = distanceBetweenSensors/2; // Distance from distance sensor to the middle of the drivetrain
+    static double cameraToDrivetrainMiddle = distanceBetweenSensors/2; // Distance from camera to the middle of the drivetrain
+    static final double driveTrainMaxVelocity = GoBilda312DcMotorData.maxCountsPerSec;
+    static final double mecanumMoveFactor = .95;
+    static final double mecanumMoveCountsPerInch = mecanumMoveFactor * GoBilda312DcMotorData.wheelCountsPerInch;
+
+    static final double mecanumStrafeFactor = 1.075;
+    static final double mecanumStrafeCountsPerInch = mecanumStrafeFactor * GoBilda312DcMotorData.wheelCountsPerInch;
+    static final DcMotor.Direction drivetrainLeftFrontDirection = DcMotor.Direction.REVERSE;
+    static final DcMotor.Direction drivetrainLeftRearDirection = DcMotor.Direction.REVERSE;
+    static final DcMotor.Direction drivetrainRightFrontDirection = DcMotor.Direction.FORWARD;
+    static final DcMotor.Direction drivetrainRightRearDirection = DcMotor.Direction.FORWARD;
     static final double maxNormalSpeed = 0.8;
     static final double maxCreepSpeed = 0.15;
-    static final double maxAutoSpeed = 0.6;
+    static final double maxAutoSpeed = 0.5;
     static final double autoTurnGain = 0.02;   // Larger is more responsive, but also less stable
     static final double autoDriveGain = 0.03;
-    static final double maxAutoStrafeSpeed = 0.6;
-    static final double maxAutoCorrectionDriveSpeed = 0.6; // Max driving speed for better distance accuracy
-    static final double maxAutoCorrectionTurnSpeed = 0.6; // Max Turn speed to limit turn rate
+    static final double maxAutoStrafeSpeed = 0.5;
+    static final double maxAutoCorrectionDriveSpeed = 0.5; // Max driving speed for better distance accuracy
+    static final double maxAutoCorrectionTurnSpeed = 0.5; // Max Turn speed to limit turn rate
     static final double autoHeadingThreshold = 0.5; // How close the heading must be to the target
 
     // Lift Settings
@@ -46,17 +48,15 @@ public class Constants {
     static final double grabberOpenPosition = 1.5;
 
     // Prop Detection Settings
-    static double sensorToDrivetrainMiddle = 5.5; // Distance from distance sensor to the middle of the drivetrain
     static final double dsDistanceToCenterOfSpikeMarks = 25.0;
-    static final double dsPropDistanceThreshold = 12;
-    static final int dsBoardHeading = -90;
+    static final double dsPropDistanceThreshold = 14;
+
     static final double dsPlacementDistanceOffset = 5.5;
     static final double dsFarPositionStrafeDistance = 8;
     static final double dsMiddlePositionStrafeDistance = 4.5;
     static final double dsNearPositionStrafeDistance = 12;
 
     // April Tag Detection Settings
-    static double cameraToDrivetrainMiddle = 5.5; // Distance from camera to the middle of the drivetrain
     static final double atAxialGain = 0.02;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     static final double atStrafeGain = 0.02;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
     static final double atYawGain = 0.02;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
@@ -65,6 +65,11 @@ public class Constants {
     static final double atMaxYaw = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
     static final int atExposureMS = 6;
     static final int atExposureGain = 250;
+
+    // Pixel placement settings
+    static final double boardApproachDistance = 4;
+    static final double boardOffsetDistance = 8;
+    static final double boardEscapeDistance = 10;
 
     // Parking Settings
     static final double distanceBetweenAprilTags = 6;

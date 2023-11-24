@@ -13,7 +13,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-// Possible positions for the prop relative to the board
+// Possible positions for the prop relative to the rigging
 // Used to invert the prop search order for blue vs red
 enum PropPosition {NEAR, MIDDLE, FAR}
 
@@ -21,29 +21,28 @@ enum PropPosition {NEAR, MIDDLE, FAR}
 enum BotPosition {RED_FAR, RED_NEAR, BLUE_FAR, BLUE_NEAR}
 
 // Target parking position
-enum ParkPosition {CENTER, CORNER}
+//enum ParkPosition {CENTER, CORNER}
 
 public abstract class AutoMaster extends LinearOpMode {
     protected Bot bot = null;
-    protected BotPosition botPosition;
-    protected PropPosition propPosition = null;
-    protected ParkPosition parkPosition;
-    protected int targetAprilTagNumber = 0;
-    protected int directionFactor = 1;
+    protected final BotPosition botStartPosition;
+    protected final double boardHeading;
     private AprilTagProcessor aprilTagProcessor = null;
     private VisionPortal visionPortal = null;
 
-    public AutoMaster(BotPosition botPosition, ParkPosition parkPosition) {
-        this.botPosition = botPosition;
-        this.parkPosition = parkPosition;
+    public AutoMaster(BotPosition botStartPosition) {
+        this.botStartPosition = botStartPosition;
+//        this.parkPosition = parkPosition;
+        boardHeading = boardDirectionFactor() * -90;
     }
 
     @Override
     public void runOpMode() {
+        PropPosition propPosition;
+        int targetAprilTagNumber;
         createBot();
 
-        directionFactor = directionFactor();
-        bot.grabberClose();
+//        bot.grabberClose();
 
         initAprilTag();
 
@@ -52,164 +51,206 @@ public abstract class AutoMaster extends LinearOpMode {
         waitForStart();
 
         // Raise lift, raise wrist, close grabber
-        setToCruisingPosition();
+        //setToCruisingPosition();
 
-        // Move to the center of the spike marks
-        moveToCenterOfSpikeMarks();
+        //sleep(300);
 
-        // Determine prop position, and place the purple pixel on the spike mark
-        dsPlacePurplePixel();
+        // Determine prop position, place the purple pixel on the spike mark, then go to escape position
+        propPosition = dsPlacePurplePixel();
 
-        // Leave the spike mark square and move to a tile that faces the parking position
-        // Align camera roughly with appropriate April Tag
-        escapeSquare();
-
-        determineTargetAprilTagNumber();
+        targetAprilTagNumber = aprilTagNumber(propPosition);
 
         // Correct strafe and yaw to directly face the target April Tag
         autoOrientToAprilTag(targetAprilTagNumber);
 
+        bot.turnToHeading(boardHeading);
+
         placePixelOnBoard();
 
-        // Move straight until close to the wall, turn, and parallel park
-        park(parkStrafeDistance());
-
-        // Lower lift, lower wrist, open grabber
-        setStationaryPosition();
+//        // Move straight until close to the wall, turn, and parallel park
+        park(parkStrafeVector(targetAprilTagNumber));
+//
+//        // Lower lift, lower wrist, open grabber
+//        setStationaryPosition();
     }
 
     protected void createBot() {
         bot = new Bot(this, Constants.maxAutoSpeed);
     }
 
-    protected abstract int directionFactor();
+    protected abstract double boardDirectionFactor(); // 1 = right, -1 = left
 
-    protected abstract double parkStrafeDistance();
+    protected abstract double riggingDirectionFactor(); // 1 = right, -1 = left
+
+    protected abstract double parkStrafeVector(int targetAprilTagNumber);
 
     protected void setToCruisingPosition() {
-        bot.wristUp();
-        bot.grabberClose();
-        bot.liftStopAtPosition(550);
+//        bot.wristUp();
+//        bot.grabberClose();
+//        bot.liftStopAtPosition(550);
     }
 
-    protected void moveToCenterOfSpikeMarks() {
-        bot.moveStraightForDistance(Constants.dsDistanceToCenterOfSpikeMarks);
-    }
+    protected PropPosition dsPlacePurplePixel() {
+        double propDistance;
+        PropPosition propPosition = null;
+        double farSeekStrafe = 11.5 - Constants.sensorToDrivetrainMiddle;
+        double farSeekMove = 1.25 * Constants.drivetrainLength;
+        double farPushMove = 10;
+        double escapeMove = 0.90 * Constants.drivetrainLength;
+        double middleSeekMove = 8;
+        double middlePushMove = 12;
+        double nearPushMove = 12;
+        double boardCorrectionFactor = 0;
 
-    // Scan for prop in one of three positions
-    // Return position 1, 2, or 3 (far from board, middle, close to board)
-    protected void dsPlacePurplePixel() {
-        double objectDistance;
-        PropPosition objectPosition = null;
-        double defaultObjectDistance = (Constants.tileSize/2 - Constants.drivetrainLength/2);
-        double boardHeading = directionFactor * Constants.dsBoardHeading;
-        double middleStrafe = Constants.sensorToDrivetrainMiddle;
-        double nearStrafe = directionFactor * (Constants.spikeMarkSize / 2 + directionFactor * Constants.sensorToDrivetrainMiddle);
-        double farStraight = Constants.drivetrainLength;
-        double farStrafe =  directionFactor * (Constants.sensorToDrivetrainMiddle - Constants.spikeMarkSize / 2);
-
-        // Scan for middle position
-        bot.strafeForDistance(-middleStrafe);
-        objectDistance = bot.getDistance();
-        if (objectDistance < Constants.dsPropDistanceThreshold) {
-            objectPosition = PropPosition.MIDDLE;
-            pushPixel(objectDistance);
+        if (riggingDirectionFactor() < 1)
+        {
+            farSeekStrafe = farSeekStrafe + Constants.sensorToDrivetrainMiddle * 2;
         }
-        bot.strafeForDistance(middleStrafe);
-        // Scan for near position
-        if (objectPosition != PropPosition.MIDDLE) {
+
+        boardCorrectionFactor = -boardDirectionFactor();
+
+        // Scan for FAR position
+        bot.strafeForDistance(-riggingDirectionFactor() * farSeekStrafe);
+        bot.moveStraightForDistance(farSeekMove);
+        if (bot.getDistance() < Constants.dsPropDistanceThreshold) {
+            propPosition = PropPosition.FAR;
+            bot.strafeForDistance(Constants.sensorToDrivetrainMiddle);
+            pushPixel(farPushMove);
             bot.turnToHeading(boardHeading);
-            bot.strafeForDistance(-nearStrafe);
-            objectDistance = bot.getDistance();
-            if (objectDistance < Constants.dsPropDistanceThreshold) {
-                objectPosition = PropPosition.NEAR;
-                pushPixel(objectDistance);
+            bot.moveStraightForDistance(escapeMove);
+//            telemetry.addData("Strafe: ", (boardDirectionFactor() * -(boardCorrectionFactor * 2 * Constants.sensorToDrivetrainMiddle)));
+//            telemetry.update();
+//            sleep(3000);
+
+            bot.strafeForDistance(boardDirectionFactor() * -(boardCorrectionFactor * 2 * Constants.sensorToDrivetrainMiddle));
+        }
+
+        // Scan for MIDDLE position
+        if (propPosition == null) {
+            bot.strafeForDistance(-riggingDirectionFactor() * farSeekStrafe);
+            bot.moveStraightForDistance(middleSeekMove);
+            bot.strafeForDistance(-Constants.sensorToDrivetrainMiddle);
+            propDistance = bot.getDistance();
+            bot.strafeForDistance(Constants.sensorToDrivetrainMiddle);
+            if (propDistance < Constants.dsPropDistanceThreshold) {
+                propPosition = PropPosition.MIDDLE;
+                pushPixel(middlePushMove);
+                bot.moveStraightForDistance(-middleSeekMove);
+                bot.turnToHeading(boardHeading);
+                bot.moveStraightForDistance(escapeMove + farSeekStrafe + Constants.sensorToDrivetrainMiddle);
+                bot.strafeForDistance(boardDirectionFactor() * -(Constants.distanceBetweenAprilTags + boardCorrectionFactor * 2 * Constants.sensorToDrivetrainMiddle));
             }
-            bot.strafeForDistance(-nearStrafe);
         }
-        // If object not yet found, assumed far position
-        if (objectPosition != PropPosition.NEAR) {
-            objectPosition = PropPosition.FAR;
-//            bot.moveStraightForDistance(farStraight);
+
+        if (propPosition == null) {
+            // If object not yet found, assumed NEAR position
+            propPosition = PropPosition.NEAR;
             bot.turnToHeading(-boardHeading);
-//            bot.moveStraightForDistance(farStraight);
-            bot.strafeForDistance(-farStrafe);
-            pushPixel(defaultObjectDistance);
-            bot.strafeForDistance(farStrafe);
+            bot.strafeForDistance(riggingDirectionFactor() * Constants.sensorToDrivetrainMiddle);
+            pushPixel(nearPushMove);
+            bot.strafeForDistance(-riggingDirectionFactor() * Constants.sensorToDrivetrainMiddle);
+            bot.turnToHeading(0);
+            bot.moveStraightForDistance(-middleSeekMove);
+            bot.turnToHeading(boardHeading);
+            bot.moveStraightForDistance(escapeMove + farSeekStrafe + Constants.sensorToDrivetrainMiddle);
+            bot.strafeForDistance(boardDirectionFactor() * -(2 * Constants.distanceBetweenAprilTags + boardCorrectionFactor * 2 * Constants.sensorToDrivetrainMiddle));
         }
-        propPosition = objectPosition;
+        return (propPosition);
     }
 
-    protected double validateDistance(double min, double max, double objectDistance, double defaultDistance) {
-        if ((objectDistance > max) || (objectDistance < min)) {
-            return (defaultDistance);
-        }
-        return (objectDistance);
-    }
-
-    protected void pushPixel(double objectDistance) {
-        bot.moveStraightForDistance(Constants.dsPlacementDistanceOffset + objectDistance);
-        bot.moveStraightForDistance(-Constants.dsPlacementDistanceOffset - objectDistance);
+    protected void pushPixel(double distance) {
+        bot.moveStraightForDistance(distance);
+        bot.moveStraightForDistance(-distance);
     }
 
     protected void placePixelOnBoard() {
-        bot.moveStraightForDistance(boardApproachDistance());
-        bot.strafeForDistance(-6);
-        bot.liftStopAtPosition(750);
-        bot.creepStraightForDistance(bot.getDistance() - 9);
-        bot.grabberOpen();
-        bot.moveStraightForDistance(-10);
+        double boardDistance;
+        bot.moveStraightForDistance(Constants.boardApproachDistance);
+        bot.strafeForDistance(-Constants.sensorToDrivetrainMiddle);
+//        bot.liftStopAtPosition(750);
+        //creepToContact();
+        boardDistance = bot.getDistance();
+        bot.creepStraightForDistance(boardDistance - Constants.boardOffsetDistance);
+//        bot.grabberOpen();
+        bot.moveStraightForDistance(-Constants.boardEscapeDistance);
     }
 
-    protected void escapeSquare() {
-        double nearForwardDistance = 20;
-        double middleForwardDistance = 20;
-        double farForwardDistance = 15;
-        double farBackwardDistance = 4;
-        double nearStrafeDistance = 37;
-        double middleStrafeDistance = 0;
-        double boardHeading = directionFactor * Constants.dsBoardHeading;
-
-        if (directionFactor == -1) {
-            nearStrafeDistance = 26;
-            middleStrafeDistance = 4;
-        }
-
-        if (propPosition == PropPosition.FAR) {
-            bot.moveStraightForDistance(-farBackwardDistance);
-            bot.turnToHeading(boardHeading);
-            bot.moveStraightForDistance(farForwardDistance);
-            bot.strafeForDistance(-(directionFactor * 2));
-        } else {
-            if (propPosition == PropPosition.NEAR) {
-                bot.strafeForDistance(-(directionFactor * nearStrafeDistance));
-                bot.moveStraightForDistance(nearForwardDistance);
-                bot.strafeForDistance(directionFactor * nearStrafeDistance);
-
-            } else {
-                bot.turnToHeading(boardHeading);
-                bot.moveStraightForDistance(middleForwardDistance);
-                bot.strafeForDistance(-(directionFactor * middleStrafeDistance));
-            }
-        }
-    }
-
-    protected void park(double parkStrafeDistance) {
-        bot.liftStopAtPosition(0);
-        bot.turnToHeading(directionFactor * 90);
-        bot.strafeForDistance(parkStrafeDistance);
+    protected void park(double parkStrafeVector) {
+//        bot.liftStopAtPosition(0);
+//        telemetry.addData("vector",parkStrafeVector);
+//        telemetry.update();
+//        sleep(5000);
+        bot.strafeForDistance(parkStrafeVector);
+        bot.turnToHeading(-boardHeading);
         bot.moveStraightForDistance(-15);
         bot.stopDrive();
     }
 
-    protected abstract double boardApproachDistance();
-
     protected void setStationaryPosition() {
-        bot.wristDown();
-        bot.liftStopAtPosition(0);
+//        bot.wristDown();
+//        bot.liftStopAtPosition(0);
     }
 
-    protected abstract void determineTargetAprilTagNumber();
+    protected abstract int aprilTagNumber(PropPosition propPosition);
+
+    public void autoStrafeToAprilTag(int targetTagNumber) {
+        AprilTagDetection targetTag;
+        boolean targetFound;
+        double strafeError;
+        double yawError;
+        double strafePower = 1;
+//        double yawPower = 1;
+        double minStrafePower = .01;
+        double minYawPower = 0.01;
+
+        while (Math.abs(strafePower) > minStrafePower) {
+            targetFound = false;
+            targetTag = null;
+
+            // Search through detected tags to find the target tag
+            List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                // Look to see if we have size info on this tag
+                if (detection.metadata != null) {
+                    //  Check to see if we want to track towards this tag
+                    if (detection.id == targetTagNumber) {
+                        // Yes, we want to use this tag.
+                        targetFound = true;
+                        targetTag = detection;
+                        break;  // don't look any further.
+                    } else {
+                        // This tag is in the library, but we do not want to track it right now.
+                        telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                    }
+                } else {
+                    // This tag is NOT in the library, so we don't have enough information to track to it.
+                    telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+                }
+            }
+
+            // Tell the driver what we see, and what to do.
+            if (targetFound) {
+                telemetry.addData("Found", "ID %d (%s)", targetTag.id, targetTag.metadata.name);
+                telemetry.addData("Range", "%5.1f inches", targetTag.ftcPose.range);
+                telemetry.addData("Bearing", "%3.0f degrees", targetTag.ftcPose.bearing);
+                telemetry.addData("Yaw", "%3.0f degrees", targetTag.ftcPose.yaw);
+
+                // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
+                strafeError = targetTag.ftcPose.bearing;
+                yawError = targetTag.ftcPose.yaw;
+
+                // Use the speed and turn "gains" to calculate how we want the robot to move.
+//                yawPower = Range.clip(strafeError * Constants.atYawGain, -Constants.atMaxYaw, Constants.atMaxYaw);
+                strafePower = Range.clip(-yawError * Constants.atStrafeGain, -Constants.atMaxStrafe, Constants.atMaxStrafe);
+
+                telemetry.addData("Auto", "Strafe %5.2f", strafePower);
+            }
+            telemetry.update();
+            // Apply desired axes motions to the drivetrain.
+            bot.moveDirection(0, strafePower, 0);
+            sleep(10);
+        }
+    }
 
     public void autoOrientToAprilTag(int targetTagNumber) {
         AprilTagDetection targetTag;

@@ -5,35 +5,35 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Autonomous(name = "RedNearCenter528", group = "Autonomous")
 public class RedNearCenter528 extends AutoMaster {
     public RedNearCenter528() {
-        super(BotPosition.RED_NEAR, ParkPosition.CENTER);
+        super(BotPosition.RED_NEAR);
     }
 
-    protected int directionFactor()
+    protected double boardDirectionFactor()
     {
         return(1);
     }
 
-    protected void determineTargetAprilTagNumber() {
-        if (propPosition == PropPosition.FAR) {
-            targetAprilTagNumber = 4;
-        }
+    protected double riggingDirectionFactor()
+    {
+        return(-1);
+    }
+
+    protected int aprilTagNumber(PropPosition propPosition) {
+        int tagNumber =  4;
 
         if (propPosition == PropPosition.MIDDLE) {
-            targetAprilTagNumber = 5;
+            tagNumber = 5;
         }
 
-        if (propPosition == PropPosition.NEAR) {
-            targetAprilTagNumber = 6;
+        if (propPosition == PropPosition.FAR) {
+            tagNumber = 6;
         }
+        return(tagNumber);
     }
-    protected double boardApproachDistance()
+    protected double parkStrafeVector(int targetAprilTagNumber)
     {
-        return(2);
-    }
-    protected double parkStrafeDistance()
-    {
-        double slotsFromParkingPosition = targetAprilTagNumber - 3 + 1.5;
-        return(directionFactor * (slotsFromParkingPosition * Constants.distanceBetweenAprilTags));
+        double slotsFromParkingPosition = targetAprilTagNumber - 3 + .5;
+        return(-(slotsFromParkingPosition * Constants.distanceBetweenAprilTags + Constants.sensorToDrivetrainMiddle * 2));
     }
 }
 

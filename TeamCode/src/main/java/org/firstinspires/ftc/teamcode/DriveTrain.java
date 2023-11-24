@@ -19,9 +19,9 @@ public class DriveTrain {
     private DcMotorEx leftRearDrive = null;
     private DcMotorEx rightRearDrive = null;
     private double maxSpeed = 0.8; // Factor (0.0-1.0) to control drive speed
-    private double maxVelocity = Constants.driveTrainMaxVelocityRev15;
-
-    private double countsPerInch = Constants.driveTrainCountsPerInchRev15;
+    private double maxVelocity = Constants.driveTrainMaxVelocity;
+    private double moveCountsPerInch = Constants.mecanumMoveCountsPerInch;
+    private double strafeCountsPerInch = Constants.mecanumStrafeCountsPerInch;
     private IMU imu = null;
     LinearOpMode opMode = null;
 
@@ -34,7 +34,7 @@ public class DriveTrain {
         rightRearDrive = opMode.hardwareMap.get(DcMotorEx.class, "right_rear_drive");
 
         leftFrontDrive.setDirection(Constants.drivetrainLeftFrontDirection);
-        rightRearDrive.setDirection(Constants.drivetrainLeftRearDirection);
+        leftRearDrive.setDirection(Constants.drivetrainLeftRearDirection);
         rightFrontDrive.setDirection(Constants.drivetrainRightFrontDirection);
         rightRearDrive.setDirection(Constants.drivetrainRightRearDirection);
 
@@ -43,7 +43,7 @@ public class DriveTrain {
         setBrakingOn();
 
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
         imu = opMode.hardwareMap.get(IMU.class, "imu");
@@ -81,7 +81,7 @@ public class DriveTrain {
     }
     
     public void creepDirectionNoEnc(double axial, double strafe, double yaw) {
-        moveDirectionNoEnc(axial * Constants.maxCreepSpeed, strafe * Constants.maxCreepSpeed, yaw * Constants.maxCreepSpeed);
+        moveDirection(axial * Constants.maxCreepSpeed, strafe * Constants.maxCreepSpeed, yaw * Constants.maxCreepSpeed);
     }
     public void moveDirection(double axial, double strafe, double yaw) {
         // Calculate wheel powers.
@@ -103,38 +103,13 @@ public class DriveTrain {
         }
 
         leftFrontDrive.setVelocity(leftFrontPower * maxSpeed * maxVelocity);
-        rightFrontDrive.setVelocity(rightFrontPower * maxSpeed * maxSpeed * maxVelocity);
+        rightFrontDrive.setVelocity(rightFrontPower * maxSpeed * maxVelocity);
         leftRearDrive.setVelocity(leftRearPower * maxSpeed * maxVelocity);
         rightRearDrive.setVelocity(rightRearPower * maxSpeed * maxVelocity);
     }
 
-    public void moveDirectionNoEnc(double axial, double strafe, double yaw) {
-        // Calculate wheel powers.
-        double leftFrontPower = axial - strafe - yaw;
-        double rightFrontPower = axial + strafe + yaw;
-        double leftRearPower = axial + strafe - yaw;
-        double rightRearPower = axial - strafe + yaw;
-
-        // Normalize wheel powers to be less than 1.0
-        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftRearPower));
-        max = Math.max(max, Math.abs(rightRearPower));
-
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftRearPower /= max;
-            rightRearPower /= max;
-        }
-
-        leftFrontDrive.setPower(leftFrontPower);
-        rightFrontDrive.setPower(rightFrontPower);
-        leftRearDrive.setPower(leftRearPower);
-        rightRearDrive.setPower(rightRearPower);
-    }
-
-    public void encoderStrafeForDistance(double distance) {
-        int targetCounts = (int) (distance * countsPerInch);
+    public void strafeForDistance(double distance) {
+        int targetCounts = (int) (distance * strafeCountsPerInch);
         int leftFrontTarget = 0;
         int leftRearTarget = 0;
         int rightFrontTarget = 0;
@@ -169,7 +144,7 @@ public class DriveTrain {
         moveStraightForDistance(distance, Constants.maxCreepSpeed, Constants.maxCreepSpeed);
     }
     private void moveStraightForDistance(double distance, double turnSpeed, double driveSpeed) {
-        int targetCounts = (int) (distance * countsPerInch);
+        int targetCounts = (int) (distance * moveCountsPerInch);
         int leftFrontTarget = 0;
         int leftRearTarget = 0;
         int rightFrontTarget = 0;

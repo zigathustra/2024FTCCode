@@ -2,15 +2,15 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "RedNearCorner528", group = "Autonomous")
-public class RedNearCorner528 extends AutoMaster {
-    public RedNearCorner528() {
-        super(BotPosition.RED_NEAR);
+@Autonomous(name = "BlueFarCenter528", group = "Autonomous")
+public class BlueFarCenter528 extends AutoMaster {
+    public BlueFarCenter528() {
+        super(BotPosition.BLUE_FAR);
     }
 
     protected double boardDirectionFactor()
     {
-        return(1);
+        return(-1);
     }
 
     protected double riggingDirectionFactor()
@@ -32,7 +32,7 @@ public class RedNearCorner528 extends AutoMaster {
     }
     protected double parkStrafeVector(int targetAprilTagNumber)
     {
-        double slotsFromParkingPosition = 7 - targetAprilTagNumber + 0.5;
+        double slotsFromParkingPosition = 7 - targetAprilTagNumber + .5;
         return(slotsFromParkingPosition * Constants.distanceBetweenAprilTags + Constants.sensorToDrivetrainMiddle * 2);
     }
 }
