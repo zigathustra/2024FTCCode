@@ -35,9 +35,9 @@ import java.util.concurrent.TimeUnit;
 public class Bot {
     // Attributes for hardware
     protected DriveTrain driveTrain = null;
-    //    protected Lift lift = null;
-//    protected Servo wrist = null;
-//    protected Servo grabber = null;
+    protected Lift lift = null;
+    protected Servo wrist = null;
+    protected Servo grabber = null;
     protected Rev2mDistanceSensor distanceSensor = null;
     protected LinearOpMode opMode = null;
     protected double maxSpeed = Constants.maxNormalSpeed; // Default speed. Reassigned in the constructor.
@@ -48,13 +48,13 @@ public class Bot {
 
         driveTrain = new DriveTrain(opMode, maxSpeed);
 
-//        lift = new Lift(opMode);
-//
-//        wrist = opMode.hardwareMap.get(Servo.class, "wrist");
-//        wrist.setPosition(Constants.wristDownPosition);
-//
-//        grabber = opMode.hardwareMap.get(Servo.class, "grabber");
-//        grabber.setPosition(Constants.grabberClosedPosition);
+        lift = new Lift(opMode);
+
+        wrist = opMode.hardwareMap.get(Servo.class, "wrist");
+        wrist.setPosition(Constants.wristDownPosition);
+
+        grabber = opMode.hardwareMap.get(Servo.class, "grabber");
+        grabber.setPosition(Constants.grabberClosedPosition);
 
         distanceSensor = opMode.hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
     }
@@ -79,7 +79,6 @@ public class Bot {
     public void moveDirection(double axial, double strafe, double yaw) {
         driveTrain.moveDirection(axial, strafe, yaw);
     }
-
 
     public void moveDirectionNoEnc(double axial, double strafe, double yaw) {
         driveTrain.moveDirection(axial, strafe, yaw);
@@ -113,41 +112,42 @@ public class Bot {
         driveTrain.moveDirection(0, 0, 0);
     }
 
-    //    public void liftUp(double speed) {
-//        lift.liftUp(speed);
-//    }
-//
-//    public void liftDown(double speed) {
-//        lift.liftDown(speed);
-//    }
-//
-//    public void liftStop() {
-//        lift.stop();
-//    }
-//
-//    public void liftStopAtPosition(int position) {
-//        lift.stopAtPosition(position);
-//    }
-//
-//    public void wristUp() {
-//        wrist.setPosition(Constants.wristUpPosition);
-//    }
-//
-//    public void wristMiddle() {
-//        wrist.setPosition(Constants.wristMiddlePosition);
-//    }
-//
-//    public void wristDown() {
-//        wrist.setPosition(Constants.wristDownPosition);
-//    }
-//
-//    public void grabberOpen() {
-//        grabber.setPosition(Constants.grabberOpenPosition);
-//    }
-//
-//    public void grabberClose() {
-//        grabber.setPosition(Constants.grabberClosedPosition);
-//    }
+    public void liftUp(double speed) {
+        lift.liftUp(speed);
+    }
+
+    public void liftDown(double speed) {
+        lift.liftDown(speed);
+    }
+
+    public void liftStop() {
+        lift.stop();
+    }
+
+    public void liftStopAtPosition(int position) {
+        lift.stopAtPosition(position);
+    }
+
+    public void wristUp() {
+        wrist.setPosition(Constants.wristUpPosition);
+    }
+
+    public void wristMiddle() {
+        wrist.setPosition(Constants.wristMiddlePosition);
+    }
+
+    public void wristDown() {
+        wrist.setPosition(Constants.wristDownPosition);
+    }
+
+    public void grabberOpen() {
+        grabber.setPosition(Constants.grabberOpenPosition);
+    }
+
+    public void grabberClose() {
+        grabber.setPosition(Constants.grabberClosedPosition);
+    }
+
     public double getDistance() {
         double distance;
         opMode.sleep(50);

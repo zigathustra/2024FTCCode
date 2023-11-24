@@ -18,116 +18,133 @@ import java.util.concurrent.TimeUnit;
 enum PropPosition {NEAR, MIDDLE, FAR}
 
 // Starting position for the bot
-enum BotPosition {RED_FAR, RED_NEAR, BLUE_FAR, BLUE_NEAR}
+enum StartPosition {FAR, NEAR}
+
+enum Alliance {RED, BLUE}
 
 // Target parking position
-//enum ParkPosition {CENTER, CORNER}
+enum ParkPosition {CENTER, CORNER}
 
 public abstract class AutoMaster extends LinearOpMode {
-    protected Bot bot = null;
-    protected final BotPosition botStartPosition;
-    protected final double boardHeading;
-    private AprilTagProcessor aprilTagProcessor = null;
-    private VisionPortal visionPortal = null;
+    private Alliance alliance;
+    private StartPosition startPosition;
+    private ParkPosition parkPosition;
+    private Bot bot;
 
-    public AutoMaster(BotPosition botStartPosition) {
-        this.botStartPosition = botStartPosition;
-//        this.parkPosition = parkPosition;
-        boardHeading = boardDirectionFactor() * -90;
+    public AutoMaster(Alliance alliance, StartPosition startPosition, ParkPosition parkPosition) {
+        this.alliance = alliance;
+        this.startPosition = startPosition;
+        this.parkPosition = parkPosition;
+        bot = new Bot(this, Constants.maxAutoSpeed);
     }
 
     @Override
     public void runOpMode() {
+        int riggingDirection;
+        int boardDirection;
+        int parkDirection;
         PropPosition propPosition;
         int targetAprilTagNumber;
-        createBot();
 
-//        bot.grabberClose();
+        AprilTagProcessor aprilTagProcessor = null;
+        VisionPortal visionPortal = null;
 
-        initAprilTag();
+        if (startPosition == StartPosition.FAR) {
+            if (alliance == Alliance.BLUE) {
+                riggingDirection = -1;
+                boardDirection = -1;
+            } else {
+                riggingDirection = 1;
+                boardDirection = 1;
+            }
+        } else {
+            if (alliance == Alliance.BLUE) {
+                riggingDirection = 1;
+                boardDirection = -1;
+            } else {
+                riggingDirection = -1;
+                boardDirection = 1;
+            }
+        }
 
-        setManualExposure(Constants.atExposureMS, Constants.atExposureGain);  // Use low exposure time to reduce motion blur
+        if (parkPosition == ParkPosition.CORNER) {
+            parkDirection = boardDirection;
+        } else {
+            parkDirection = -boardDirection;
+        }
+
+        bot.grabberClose();
+
+        aprilTagProcessor = createAprilTagProcessor();
+
+        visionPortal = createVisionPortal(Constants.atExposureMS, Constants.atExposureGain, aprilTagProcessor);
+
+        //       setManualExposure(Constants.atExposureMS, Constants.atExposureGain);  // Use low exposure time to reduce motion blur
 
         waitForStart();
 
         // Raise lift, raise wrist, close grabber
-        //setToCruisingPosition();
+        setToCruisingPosition();
 
-        //sleep(300);
+        sleep(250);
 
         // Determine prop position, place the purple pixel on the spike mark, then go to escape position
-        propPosition = dsPlacePurplePixel();
+        propPosition = dsPlacePurplePixel(riggingDirection);
 
-        targetAprilTagNumber = aprilTagNumber(propPosition);
+        targetAprilTagNumber = aprilTagNumber(propPosition, boardDirection);
 
-        // Correct strafe and yaw to directly face the target April Tag
-        autoOrientToAprilTag(targetAprilTagNumber);
+        roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
 
-        bot.turnToHeading(boardHeading);
+        // Correct strafe to directly face the target April Tag
+        autoStrafeToAprilTag(aprilTagProcessor, targetAprilTagNumber);
 
-        placePixelOnBoard();
+//        bot.turnToHeading(boardHeading);
+
+//        placePixelOnBoard();
 
 //        // Move straight until close to the wall, turn, and parallel park
-        park(parkStrafeVector(targetAprilTagNumber));
+//        park(parkStrafeVector(targetAprilTagNumber));
 //
 //        // Lower lift, lower wrist, open grabber
 //        setStationaryPosition();
     }
 
-    protected void createBot() {
-        bot = new Bot(this, Constants.maxAutoSpeed);
-    }
-
-    protected abstract double boardDirectionFactor(); // 1 = right, -1 = left
-
-    protected abstract double riggingDirectionFactor(); // 1 = right, -1 = left
-
-    protected abstract double parkStrafeVector(int targetAprilTagNumber);
-
     protected void setToCruisingPosition() {
-//        bot.wristUp();
-//        bot.grabberClose();
-//        bot.liftStopAtPosition(550);
+        bot.wristUp();
+        bot.grabberClose();
+        bot.liftStopAtPosition(550);
     }
 
-    protected PropPosition dsPlacePurplePixel() {
+    protected PropPosition dsPlacePurplePixel(int riggingDirection) {
         double propDistance;
         PropPosition propPosition = null;
+        double farHeading = riggingDirection * 90;
         double farSeekStrafe = 11.5 - Constants.sensorToDrivetrainMiddle;
-        double farSeekMove = 1.25 * Constants.drivetrainLength;
-        double farPushMove = 10;
-        double escapeMove = 0.90 * Constants.drivetrainLength;
+        double farSeekMove = 17.5;
+        double farPushMove = 6;
+        double escapeMove = 12.5;
         double middleSeekMove = 8;
-        double middlePushMove = 12;
-        double nearPushMove = 12;
-        double boardCorrectionFactor = 0;
+        double middlePushMove = 8;
+        double nearPushMove = 8;
 
-        if (riggingDirectionFactor() < 1)
-        {
+        if (riggingDirection < 1) {
             farSeekStrafe = farSeekStrafe + Constants.sensorToDrivetrainMiddle * 2;
         }
 
-        boardCorrectionFactor = -boardDirectionFactor();
-
         // Scan for FAR position
-        bot.strafeForDistance(-riggingDirectionFactor() * farSeekStrafe);
+        bot.strafeForDistance(-riggingDirection * farSeekStrafe);
         bot.moveStraightForDistance(farSeekMove);
         if (bot.getDistance() < Constants.dsPropDistanceThreshold) {
             propPosition = PropPosition.FAR;
             bot.strafeForDistance(Constants.sensorToDrivetrainMiddle);
             pushPixel(farPushMove);
-            bot.turnToHeading(boardHeading);
+            bot.turnToHeading(farHeading);
             bot.moveStraightForDistance(escapeMove);
-//            telemetry.addData("Strafe: ", (boardDirectionFactor() * -(boardCorrectionFactor * 2 * Constants.sensorToDrivetrainMiddle)));
-//            telemetry.update();
-//            sleep(3000);
-
-            bot.strafeForDistance(boardDirectionFactor() * -(boardCorrectionFactor * 2 * Constants.sensorToDrivetrainMiddle));
         }
 
         // Scan for MIDDLE position
         if (propPosition == null) {
-            bot.strafeForDistance(-riggingDirectionFactor() * farSeekStrafe);
+            bot.strafeForDistance(-riggingDirection * farSeekStrafe);
             bot.moveStraightForDistance(middleSeekMove);
             bot.strafeForDistance(-Constants.sensorToDrivetrainMiddle);
             propDistance = bot.getDistance();
@@ -136,72 +153,74 @@ public abstract class AutoMaster extends LinearOpMode {
                 propPosition = PropPosition.MIDDLE;
                 pushPixel(middlePushMove);
                 bot.moveStraightForDistance(-middleSeekMove);
-                bot.turnToHeading(boardHeading);
+                bot.turnToHeading(farHeading);
                 bot.moveStraightForDistance(escapeMove + farSeekStrafe + Constants.sensorToDrivetrainMiddle);
-                bot.strafeForDistance(boardDirectionFactor() * -(Constants.distanceBetweenAprilTags + boardCorrectionFactor * 2 * Constants.sensorToDrivetrainMiddle));
             }
         }
 
         if (propPosition == null) {
             // If object not yet found, assumed NEAR position
             propPosition = PropPosition.NEAR;
-            bot.turnToHeading(-boardHeading);
-            bot.strafeForDistance(riggingDirectionFactor() * Constants.sensorToDrivetrainMiddle);
+            bot.turnToHeading(-farHeading);
+            bot.strafeForDistance(riggingDirection * Constants.sensorToDrivetrainMiddle);
             pushPixel(nearPushMove);
-            bot.strafeForDistance(-riggingDirectionFactor() * Constants.sensorToDrivetrainMiddle);
+            bot.strafeForDistance(-riggingDirection * Constants.sensorToDrivetrainMiddle);
             bot.turnToHeading(0);
             bot.moveStraightForDistance(-middleSeekMove);
-            bot.turnToHeading(boardHeading);
+            bot.turnToHeading(farHeading);
             bot.moveStraightForDistance(escapeMove + farSeekStrafe + Constants.sensorToDrivetrainMiddle);
-            bot.strafeForDistance(boardDirectionFactor() * -(2 * Constants.distanceBetweenAprilTags + boardCorrectionFactor * 2 * Constants.sensorToDrivetrainMiddle));
         }
         return (propPosition);
     }
 
     protected void pushPixel(double distance) {
-        bot.moveStraightForDistance(distance);
-        bot.moveStraightForDistance(-distance);
+        bot.moveStraightForDistance(distance + Constants.dsPlacementDistanceOffset);
+        bot.moveStraightForDistance(-(distance + Constants.dsPlacementDistanceOffset));
     }
 
-    protected void placePixelOnBoard() {
-        double boardDistance;
-        bot.moveStraightForDistance(Constants.boardApproachDistance);
-        bot.strafeForDistance(-Constants.sensorToDrivetrainMiddle);
-//        bot.liftStopAtPosition(750);
-        //creepToContact();
-        boardDistance = bot.getDistance();
-        bot.creepStraightForDistance(boardDistance - Constants.boardOffsetDistance);
-//        bot.grabberOpen();
-        bot.moveStraightForDistance(-Constants.boardEscapeDistance);
+    protected int aprilTagNumber(PropPosition propPosition, int boardDirection) {
+        int aprilTagNumber;
+        if (boardDirection == -1) {
+            aprilTagNumber = 1;
+            if (propPosition == PropPosition.MIDDLE) {
+                aprilTagNumber = 2;
+            } else if (propPosition == PropPosition.NEAR) {
+                aprilTagNumber = 3;
+            }
+        } else {
+            aprilTagNumber = 4;
+            if (propPosition == PropPosition.MIDDLE) {
+                aprilTagNumber = 5;
+            } else if (propPosition == PropPosition.FAR) {
+                aprilTagNumber = 6;
+            }
+        }
+        return (aprilTagNumber);
     }
 
-    protected void park(double parkStrafeVector) {
-//        bot.liftStopAtPosition(0);
-//        telemetry.addData("vector",parkStrafeVector);
-//        telemetry.update();
-//        sleep(5000);
-        bot.strafeForDistance(parkStrafeVector);
-        bot.turnToHeading(-boardHeading);
-        bot.moveStraightForDistance(-15);
-        bot.stopDrive();
+    private void roughAlignToAprilTag(int boardDirection, int targetAprilTagNumber, StartPosition startPosition) {
+        double strafeVector = 0;
+        if (boardDirection < 1) {
+            strafeVector = strafeVector + 2 * Constants.sensorToDrivetrainMiddle;
+            if (startPosition == StartPosition.FAR) {
+
+            } else {
+                strafeVector = strafeVector + (targetAprilTagNumber - 1) * Constants.sensorToDrivetrainMiddle;
+            }
+        } else {
+            if (startPosition == StartPosition.FAR) {
+            } else {
+                strafeVector = -(targetAprilTagNumber - 4) * Constants.sensorToDrivetrainMiddle;
+            }
+        }
+        bot.strafeForDistance(strafeVector);
     }
-
-    protected void setStationaryPosition() {
-//        bot.wristDown();
-//        bot.liftStopAtPosition(0);
-    }
-
-    protected abstract int aprilTagNumber(PropPosition propPosition);
-
-    public void autoStrafeToAprilTag(int targetTagNumber) {
+    public void autoStrafeToAprilTag(AprilTagProcessor aprilTagProcessor, int targetTagNumber) {
         AprilTagDetection targetTag;
         boolean targetFound;
-        double strafeError;
         double yawError;
         double strafePower = 1;
-//        double yawPower = 1;
         double minStrafePower = .01;
-        double minYawPower = 0.01;
 
         while (Math.abs(strafePower) > minStrafePower) {
             targetFound = false;
@@ -236,11 +255,9 @@ public abstract class AutoMaster extends LinearOpMode {
                 telemetry.addData("Yaw", "%3.0f degrees", targetTag.ftcPose.yaw);
 
                 // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-                strafeError = targetTag.ftcPose.bearing;
                 yawError = targetTag.ftcPose.yaw;
 
                 // Use the speed and turn "gains" to calculate how we want the robot to move.
-//                yawPower = Range.clip(strafeError * Constants.atYawGain, -Constants.atMaxYaw, Constants.atMaxYaw);
                 strafePower = Range.clip(-yawError * Constants.atStrafeGain, -Constants.atMaxStrafe, Constants.atMaxStrafe);
 
                 telemetry.addData("Auto", "Strafe %5.2f", strafePower);
@@ -251,69 +268,37 @@ public abstract class AutoMaster extends LinearOpMode {
             sleep(10);
         }
     }
-
-    public void autoOrientToAprilTag(int targetTagNumber) {
-        AprilTagDetection targetTag;
-        boolean targetFound;
-        double strafeError;
-        double yawError;
-        double strafePower = 1;
-        double yawPower = 1;
-        double minStrafePower = .01;
-        double minYawPower = 0.01;
-
-        while ((Math.abs(strafePower) > minStrafePower) || (Math.abs(yawPower) > minYawPower)) {
-            targetFound = false;
-            targetTag = null;
-
-            // Search through detected tags to find the target tag
-            List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
-            for (AprilTagDetection detection : currentDetections) {
-                // Look to see if we have size info on this tag
-                if (detection.metadata != null) {
-                    //  Check to see if we want to track towards this tag
-                    if (detection.id == targetTagNumber) {
-                        // Yes, we want to use this tag.
-                        targetFound = true;
-                        targetTag = detection;
-                        break;  // don't look any further.
-                    } else {
-                        // This tag is in the library, but we do not want to track it right now.
-                        telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
-                    }
-                } else {
-                    // This tag is NOT in the library, so we don't have enough information to track to it.
-                    telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-                }
-            }
-
-            // Tell the driver what we see, and what to do.
-            if (targetFound) {
-                telemetry.addData("Found", "ID %d (%s)", targetTag.id, targetTag.metadata.name);
-                telemetry.addData("Range", "%5.1f inches", targetTag.ftcPose.range);
-                telemetry.addData("Bearing", "%3.0f degrees", targetTag.ftcPose.bearing);
-                telemetry.addData("Yaw", "%3.0f degrees", targetTag.ftcPose.yaw);
-
-                // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-                strafeError = targetTag.ftcPose.bearing;
-                yawError = targetTag.ftcPose.yaw;
-
-                // Use the speed and turn "gains" to calculate how we want the robot to move.
-                yawPower = Range.clip(strafeError * Constants.atYawGain, -Constants.atMaxYaw, Constants.atMaxYaw);
-                strafePower = Range.clip(-yawError * Constants.atStrafeGain, -Constants.atMaxStrafe, Constants.atMaxStrafe);
-
-                telemetry.addData("Auto", "Strafe %5.2f, Turn %5.2f ", strafePower, yawPower);
-            }
-            telemetry.update();
-            // Apply desired axes motions to the drivetrain.
-            bot.moveDirection(0, strafePower, yawPower);
-            sleep(10);
-        }
+    protected void placePixelOnBoard() {
+        double boardDistance;
+        bot.moveStraightForDistance(Constants.boardApproachDistance);
+        bot.strafeForDistance(-Constants.sensorToDrivetrainMiddle);
+        bot.liftStopAtPosition(750);
+        //creepToContact();
+        boardDistance = bot.getDistance();
+        bot.creepStraightForDistance(boardDistance - Constants.boardOffsetDistance);
+        bot.grabberOpen();
+        bot.moveStraightForDistance(-Constants.boardEscapeDistance);
     }
 
-    protected void initAprilTag() {
+//    protected void park() {
+//        bot.liftStopAtPosition(0);
+//        telemetry.addData("vector",parkStrafeVector);
+//        telemetry.update();
+//        sleep(5000);
+//        bot.strafeForDistance(parkStrafeVector);
+//        bot.turnToHeading(-boardHeading);
+//        bot.moveStraightForDistance(-15);
+//        bot.stopDrive();
+//    }
+
+    protected void setStationaryPosition() {
+        bot.wristDown();
+        bot.liftStopAtPosition(0);
+    }
+
+    protected AprilTagProcessor createAprilTagProcessor() {
         // Create the AprilTag processor by using a builder.
-        aprilTagProcessor = new AprilTagProcessor.Builder().build();
+        AprilTagProcessor aprilTagProcessor = new AprilTagProcessor.Builder().build();
 
         // Adjust Image Decimation to trade-off detection-range for detection-rate.
         // eg: Some typical detection data using a Logitech C920 WebCam
@@ -324,20 +309,16 @@ public abstract class AutoMaster extends LinearOpMode {
         // Note: Decimation can be changed on-the-fly to adapt during a match.
         aprilTagProcessor.setDecimation(2);
 
-        visionPortal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                .addProcessor(aprilTagProcessor)
-                .build();
+        return (aprilTagProcessor);
     }
-
 
     //   Manually set the camera gain and exposure.
     //   This can only be called AFTER calling initAprilTag(), and only works for Webcams;
-    protected void setManualExposure(int exposureMS, int gain) {
-        // Wait for the camera to be open, then use the controls
-        if (visionPortal == null) {
-            return;
-        }
+    protected VisionPortal createVisionPortal(int exposureMS, int gain, AprilTagProcessor aprilTagProcessor) {
+        VisionPortal visionPortal = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .addProcessor(aprilTagProcessor)
+                .build();
 
         // Make sure camera is streaming before we try to set the exposure controls
         if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
@@ -363,5 +344,7 @@ public abstract class AutoMaster extends LinearOpMode {
             gainControl.setGain(gain);
             sleep(20);
         }
+
+        return (visionPortal);
     }
 }
