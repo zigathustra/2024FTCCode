@@ -16,7 +16,7 @@ public class TeleOp528 extends LinearOpMode {
         double rightTrigger = 0.0;
 
         bot = new TeleOpBot(this);
-//        bot.wristMiddle();
+        bot.wristMiddle();
         waitForStart();
 
         while (opModeIsActive()) {
@@ -37,28 +37,28 @@ public class TeleOp528 extends LinearOpMode {
                 } else
                     bot.moveDirection(-driveAxial, -driveStrafe, -driveYaw);
             }
-//
-//            leftTrigger = gamepad1.left_trigger;
-//            rightTrigger = gamepad1.right_trigger;
-//            if (leftTrigger > 0.3) {
-//                bot.liftDown(leftTrigger);
-//            } else if (rightTrigger > 0.3) {
-//                bot.liftUp(rightTrigger);
-//            } else {
-//                bot.liftStop();
-//            }
-//
-//            if (gamepad1.x) {
-//                bot.grabberClose();
-//            } else if (gamepad1.a) {
-//                bot.grabberOpen();
-//            }
-//
-//            if (gamepad1.b) {
-//                bot.wristUp();
-//            } else if (gamepad1.y) {
-//                bot.wristDown();
-//            }
+
+            leftTrigger = gamepad1.left_trigger;
+            rightTrigger = gamepad1.right_trigger;
+            if (leftTrigger > 0.3) {
+                bot.liftDown(leftTrigger);
+            } else if (rightTrigger > 0.3) {
+                bot.liftUp(rightTrigger);
+            } else {
+                bot.liftStop();
+            }
+
+            if (gamepad1.x) {
+                bot.grabberClose();
+            } else if (gamepad1.a) {
+                bot.grabberOpen();
+            }
+
+            if (gamepad1.b) {
+                bot.wristUp();
+            } else if (gamepad1.y) {
+                bot.wristDown();
+            }
         }
     }
 }

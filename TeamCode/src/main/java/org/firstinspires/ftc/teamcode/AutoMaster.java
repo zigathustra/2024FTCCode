@@ -29,20 +29,23 @@ public abstract class AutoMaster extends LinearOpMode {
     private Alliance alliance;
     private StartPosition startPosition;
     private ParkPosition parkPosition;
-    private Bot bot;
+    protected Bot bot;
 
     public AutoMaster(Alliance alliance, StartPosition startPosition, ParkPosition parkPosition) {
         this.alliance = alliance;
         this.startPosition = startPosition;
         this.parkPosition = parkPosition;
-        bot = new Bot(this, Constants.maxAutoSpeed);
+
+        //bot = new Bot(this, Constants.maxAutoSpeed);
     }
 
     @Override
     public void runOpMode() {
+        bot = new Bot(this, Constants.maxAutoSpeed);
         int riggingDirection;
         int boardDirection;
         int parkDirection;
+        double boardHeading;
         PropPosition propPosition;
         int targetAprilTagNumber;
 
@@ -72,6 +75,7 @@ public abstract class AutoMaster extends LinearOpMode {
         } else {
             parkDirection = -boardDirection;
         }
+        boardHeading = boardDirection * -90;
 
         bot.grabberClose();
 
@@ -86,7 +90,7 @@ public abstract class AutoMaster extends LinearOpMode {
         // Raise lift, raise wrist, close grabber
         setToCruisingPosition();
 
-        sleep(250);
+        sleep(100);
 
         // Determine prop position, place the purple pixel on the spike mark, then go to escape position
         propPosition = dsPlacePurplePixel(riggingDirection);
@@ -96,17 +100,17 @@ public abstract class AutoMaster extends LinearOpMode {
         roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
 
         // Correct strafe to directly face the target April Tag
-        autoStrafeToAprilTag(aprilTagProcessor, targetAprilTagNumber);
+        autoOrientToAprilTag(aprilTagProcessor, targetAprilTagNumber);
 
 //        bot.turnToHeading(boardHeading);
 
-//        placePixelOnBoard();
+        placePixelOnBoard();
 
-//        // Move straight until close to the wall, turn, and parallel park
-//        park(parkStrafeVector(targetAprilTagNumber));
-//
+        // Move straight until close to the wall, turn, and parallel park
+        park(boardHeading);
+
 //        // Lower lift, lower wrist, open grabber
-//        setStationaryPosition();
+        setStationaryPosition();
     }
 
     protected void setToCruisingPosition() {
@@ -127,7 +131,7 @@ public abstract class AutoMaster extends LinearOpMode {
         double middlePushMove = 8;
         double nearPushMove = 8;
 
-        if (riggingDirection < 1) {
+        if (riggingDirection > 0) {
             farSeekStrafe = farSeekStrafe + Constants.sensorToDrivetrainMiddle * 2;
         }
 
@@ -144,7 +148,7 @@ public abstract class AutoMaster extends LinearOpMode {
 
         // Scan for MIDDLE position
         if (propPosition == null) {
-            bot.strafeForDistance(-riggingDirection * farSeekStrafe);
+            bot.strafeForDistance(riggingDirection * farSeekStrafe);
             bot.moveStraightForDistance(middleSeekMove);
             bot.strafeForDistance(-Constants.sensorToDrivetrainMiddle);
             propDistance = bot.getDistance();
@@ -162,9 +166,9 @@ public abstract class AutoMaster extends LinearOpMode {
             // If object not yet found, assumed NEAR position
             propPosition = PropPosition.NEAR;
             bot.turnToHeading(-farHeading);
-            bot.strafeForDistance(riggingDirection * Constants.sensorToDrivetrainMiddle);
-            pushPixel(nearPushMove);
             bot.strafeForDistance(-riggingDirection * Constants.sensorToDrivetrainMiddle);
+            pushPixel(nearPushMove);
+            bot.strafeForDistance(riggingDirection * Constants.sensorToDrivetrainMiddle);
             bot.turnToHeading(0);
             bot.moveStraightForDistance(-middleSeekMove);
             bot.turnToHeading(farHeading);
@@ -181,11 +185,11 @@ public abstract class AutoMaster extends LinearOpMode {
     protected int aprilTagNumber(PropPosition propPosition, int boardDirection) {
         int aprilTagNumber;
         if (boardDirection == -1) {
-            aprilTagNumber = 1;
+            aprilTagNumber = 4;
             if (propPosition == PropPosition.MIDDLE) {
-                aprilTagNumber = 2;
+                aprilTagNumber = 5;
             } else if (propPosition == PropPosition.NEAR) {
-                aprilTagNumber = 3;
+                aprilTagNumber = 6;
             }
         } else {
             aprilTagNumber = 4;
@@ -198,31 +202,36 @@ public abstract class AutoMaster extends LinearOpMode {
         return (aprilTagNumber);
     }
 
-    private void roughAlignToAprilTag(int boardDirection, int targetAprilTagNumber, StartPosition startPosition) {
+    protected void roughAlignToAprilTag(int boardDirection, int targetAprilTagNumber, StartPosition startPosition) {
         double strafeVector = 0;
         if (boardDirection < 1) {
-            strafeVector = strafeVector + 2 * Constants.sensorToDrivetrainMiddle;
+            strafeVector = 2 * Constants.sensorToDrivetrainMiddle;
             if (startPosition == StartPosition.FAR) {
 
             } else {
-                strafeVector = strafeVector + (targetAprilTagNumber - 1) * Constants.sensorToDrivetrainMiddle;
+                strafeVector = strafeVector + (targetAprilTagNumber - 4) * Constants.distanceBetweenAprilTags;
             }
         } else {
             if (startPosition == StartPosition.FAR) {
+
             } else {
-                strafeVector = -(targetAprilTagNumber - 4) * Constants.sensorToDrivetrainMiddle;
+                strafeVector = -(targetAprilTagNumber - 4) * Constants.distanceBetweenAprilTags;
             }
         }
         bot.strafeForDistance(strafeVector);
     }
-    public void autoStrafeToAprilTag(AprilTagProcessor aprilTagProcessor, int targetTagNumber) {
+
+    protected void autoOrientToAprilTag(AprilTagProcessor aprilTagProcessor, int targetTagNumber) {
         AprilTagDetection targetTag;
         boolean targetFound;
+        double strafeError;
         double yawError;
         double strafePower = 1;
+        double yawPower = 1;
         double minStrafePower = .01;
+        double minYawPower = .01;
 
-        while (Math.abs(strafePower) > minStrafePower) {
+        while ((Math.abs(strafePower) > minStrafePower) || (Math.abs(yawPower) > minYawPower)) {
             targetFound = false;
             targetTag = null;
 
@@ -255,19 +264,23 @@ public abstract class AutoMaster extends LinearOpMode {
                 telemetry.addData("Yaw", "%3.0f degrees", targetTag.ftcPose.yaw);
 
                 // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
+                strafeError = targetTag.ftcPose.bearing;
                 yawError = targetTag.ftcPose.yaw;
 
                 // Use the speed and turn "gains" to calculate how we want the robot to move.
                 strafePower = Range.clip(-yawError * Constants.atStrafeGain, -Constants.atMaxStrafe, Constants.atMaxStrafe);
+                yawPower = Range.clip(strafeError * Constants.atYawGain, -Constants.atMaxYaw, Constants.atMaxYaw);
 
                 telemetry.addData("Auto", "Strafe %5.2f", strafePower);
+                telemetry.addData("Auto", "Yaw %5.2f", yawPower);
             }
             telemetry.update();
             // Apply desired axes motions to the drivetrain.
-            bot.moveDirection(0, strafePower, 0);
+            bot.moveDirection(0, strafePower, yawPower);
             sleep(10);
         }
     }
+
     protected void placePixelOnBoard() {
         double boardDistance;
         bot.moveStraightForDistance(Constants.boardApproachDistance);
@@ -280,16 +293,16 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.moveStraightForDistance(-Constants.boardEscapeDistance);
     }
 
-//    protected void park() {
-//        bot.liftStopAtPosition(0);
+    protected void park(double boardHeading) {
+        bot.liftStopAtPosition(0);
 //        telemetry.addData("vector",parkStrafeVector);
 //        telemetry.update();
 //        sleep(5000);
-//        bot.strafeForDistance(parkStrafeVector);
-//        bot.turnToHeading(-boardHeading);
-//        bot.moveStraightForDistance(-15);
-//        bot.stopDrive();
-//    }
+        bot.strafeForDistance(12);
+        bot.turnToHeading(-boardHeading);
+        bot.moveStraightForDistance(-2);
+        bot.stopDrive();
+    }
 
     protected void setStationaryPosition() {
         bot.wristDown();

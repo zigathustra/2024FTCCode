@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import static java.lang.Thread.sleep;
 
@@ -46,16 +47,33 @@ public class Bot {
         this.opMode = opMode;
         this.maxSpeed = maxSpeed;
 
+//        opMode.telemetry.addData("drivetrain ", 1);
+//        opMode.telemetry.update();
+//        opMode.sleep (1000);
+
         driveTrain = new DriveTrain(opMode, maxSpeed);
 
+//        opMode.telemetry.addData("lift ", 1);
+//        opMode.telemetry.update();
+//        opMode.sleep (1000);
+
         lift = new Lift(opMode);
+
+//        opMode.telemetry.addData("wrist ", 1);
+//        opMode.telemetry.update();
+//        opMode.sleep (1000);
 
         wrist = opMode.hardwareMap.get(Servo.class, "wrist");
         wrist.setPosition(Constants.wristDownPosition);
 
+//        opMode.telemetry.addData("grabber ", 1);
+//        opMode.telemetry.update();
+//        opMode.sleep (1000);
         grabber = opMode.hardwareMap.get(Servo.class, "grabber");
         grabber.setPosition(Constants.grabberClosedPosition);
-
+//        opMode.telemetry.addData("d_sensor ", 1);
+//        opMode.telemetry.update();
+//        opMode.sleep (1000);
         distanceSensor = opMode.hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
     }
 
