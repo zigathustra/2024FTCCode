@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -40,6 +41,8 @@ public class Bot {
     protected Servo wrist = null;
     protected Servo grabber = null;
     protected Rev2mDistanceSensor distanceSensor = null;
+
+    protected TouchSensor touchSensor = null;
     protected LinearOpMode opMode = null;
     protected double maxSpeed = Constants.maxNormalSpeed; // Default speed. Reassigned in the constructor.
 
@@ -75,6 +78,8 @@ public class Bot {
 //        opMode.telemetry.update();
 //        opMode.sleep (1000);
         distanceSensor = opMode.hardwareMap.get(Rev2mDistanceSensor.class, "distance_sensor");
+
+        touchSensor = opMode.hardwareMap.get(TouchSensor.class, "touch_sensor");
     }
 
     public void setRunWithoutEncoders() {
@@ -106,15 +111,16 @@ public class Bot {
         driveTrain.creepDirection(axial, strafe, yaw);
     }
 
-    public void creepDirectionNoEnc(double axial, double strafe, double yaw) {
-        driveTrain.creepDirectionNoEnc(axial, strafe, yaw);
-    }
-
     public void creepStraightForDistance(double distance) {
         driveTrain.creepStraightForDistance(distance);
     }
 
     public void creepUntilContact() {
+        creepDirection(1,0,0);
+        while (!touchSensor.isPressed())
+        {
+        }
+        stopDrive();
     }
 
     // Move straight for a specified distance in inches
@@ -122,8 +128,7 @@ public class Bot {
         driveTrain.moveStraightForDistance(distance);
     }
 
-    public void strafeForDistance(double distance) {
-        driveTrain.strafeForDistance(distance);
+    public void strafeForDistance(double distance) {driveTrain.strafeForDistance(distance);
     }
 
     public void stopDrive() {

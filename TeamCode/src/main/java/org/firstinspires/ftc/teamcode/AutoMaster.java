@@ -35,8 +35,6 @@ public abstract class AutoMaster extends LinearOpMode {
         this.alliance = alliance;
         this.startPosition = startPosition;
         this.parkPosition = parkPosition;
-
-        //bot = new Bot(this, Constants.maxAutoSpeed);
     }
 
     @Override
@@ -75,7 +73,6 @@ public abstract class AutoMaster extends LinearOpMode {
         } else {
             parkDirection = -boardDirection;
         }
-        boardHeading = boardDirection * -90;
 
         bot.grabberClose();
 
@@ -90,7 +87,7 @@ public abstract class AutoMaster extends LinearOpMode {
         // Raise lift, raise wrist, close grabber
         setToCruisingPosition();
 
-        sleep(100);
+        sleep(250);
 
         // Determine prop position, place the purple pixel on the spike mark, then go to escape position
         propPosition = dsPlacePurplePixel(riggingDirection);
@@ -102,12 +99,12 @@ public abstract class AutoMaster extends LinearOpMode {
         // Correct strafe to directly face the target April Tag
         autoOrientToAprilTag(aprilTagProcessor, targetAprilTagNumber);
 
-//        bot.turnToHeading(boardHeading);
+        bot.turnToHeading(boardDirection * -90);
 
         placePixelOnBoard();
 
         // Move straight until close to the wall, turn, and parallel park
-        park(boardHeading);
+        park(boardDirection, targetAprilTagNumber, parkDirection);
 
 //        // Lower lift, lower wrist, open grabber
         setStationaryPosition();
@@ -136,8 +133,8 @@ public abstract class AutoMaster extends LinearOpMode {
         }
 
         // Scan for FAR position
-        bot.strafeForDistance(-riggingDirection * farSeekStrafe);
         bot.moveStraightForDistance(farSeekMove);
+        bot.strafeForDistance(-riggingDirection * farSeekStrafe);
         if (bot.getDistance() < Constants.dsPropDistanceThreshold) {
             propPosition = PropPosition.FAR;
             bot.strafeForDistance(Constants.sensorToDrivetrainMiddle);
@@ -204,7 +201,7 @@ public abstract class AutoMaster extends LinearOpMode {
 
     protected void roughAlignToAprilTag(int boardDirection, int targetAprilTagNumber, StartPosition startPosition) {
         double strafeVector = 0;
-        if (boardDirection < 1) {
+        if (boardDirection < 0) {
             strafeVector = 2 * Constants.sensorToDrivetrainMiddle;
             if (startPosition == StartPosition.FAR) {
 
@@ -215,7 +212,7 @@ public abstract class AutoMaster extends LinearOpMode {
             if (startPosition == StartPosition.FAR) {
 
             } else {
-                strafeVector = -(targetAprilTagNumber - 4) * Constants.distanceBetweenAprilTags;
+                strafeVector = -(6 - targetAprilTagNumber) * Constants.distanceBetweenAprilTags;
             }
         }
         bot.strafeForDistance(strafeVector);
@@ -282,26 +279,48 @@ public abstract class AutoMaster extends LinearOpMode {
     }
 
     protected void placePixelOnBoard() {
-        double boardDistance;
         bot.moveStraightForDistance(Constants.boardApproachDistance);
         bot.strafeForDistance(-Constants.sensorToDrivetrainMiddle);
-        bot.liftStopAtPosition(750);
-        //creepToContact();
-        boardDistance = bot.getDistance();
-        bot.creepStraightForDistance(boardDistance - Constants.boardOffsetDistance);
+        bot.liftStopAtPosition(950);
+        bot.wristMiddle();
+        bot.creepUntilContact();
+        bot.moveStraightForDistance(-1);
+        bot.wristUp();
+        bot.moveStraightForDistance(1);
+        sleep(250);
         bot.grabberOpen();
+        sleep(250);
         bot.moveStraightForDistance(-Constants.boardEscapeDistance);
     }
 
-    protected void park(double boardHeading) {
-        bot.liftStopAtPosition(0);
-//        telemetry.addData("vector",parkStrafeVector);
+    protected void park(double boardDirection, int targetAprilTagNumber, double parkDirection) {
+        double strafeVector = 0;
+        int adjustedTagNumber = targetAprilTagNumber;
+        if (targetAprilTagNumber > 3) {
+            adjustedTagNumber = adjustedTagNumber - 3;
+        }
+        strafeVector = 2.5 * Constants.sensorToDrivetrainMiddle;
+
+//        telemetry.addData("parkDirection: ", parkDirection);
 //        telemetry.update();
 //        sleep(5000);
-        bot.strafeForDistance(12);
-        bot.turnToHeading(-boardHeading);
-        bot.moveStraightForDistance(-2);
-        bot.stopDrive();
+
+
+        if (parkDirection > 0) {
+            strafeVector = strafeVector + (4 - adjustedTagNumber) * Constants.distanceBetweenAprilTags;
+        } else
+        {
+            strafeVector = -strafeVector - adjustedTagNumber * Constants.distanceBetweenAprilTags;
+        }
+
+//        telemetry.addData("strafeVector: ", strafeVector);
+//        telemetry.update();
+//        sleep(5000);
+
+        bot.strafeForDistance(strafeVector);
+        bot.turnToHeading(boardDirection * 90);
+        bot.moveStraightForDistance(-10);
+        setStationaryPosition();
     }
 
     protected void setStationaryPosition() {

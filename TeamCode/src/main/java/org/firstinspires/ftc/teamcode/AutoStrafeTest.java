@@ -34,5 +34,4 @@ public class AutoStrafeTest extends AutoMaster{
             autoOrientToAprilTag(aprilTagProcessor, 5);
 
         }
-
 }

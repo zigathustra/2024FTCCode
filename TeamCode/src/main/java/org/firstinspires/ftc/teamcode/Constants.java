@@ -41,10 +41,10 @@ public class Constants {
 
     // Wrist settings
     static final double wristDownPosition = 0.4;
-    static final double wristMiddlePosition = 0.55;
-    static final double wristUpPosition = 0.75;
+    static final double wristMiddlePosition = 0.5;
+    static final double wristUpPosition = 0.95;
     // Grabber settings
-    static final double grabberClosedPosition = 0.4;
+    static final double grabberClosedPosition = 0.45;
     static final double grabberOpenPosition = 1.5;
 
     // Prop Detection Settings
