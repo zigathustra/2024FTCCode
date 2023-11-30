@@ -38,6 +38,8 @@ public class Constants {
     static final int liftMaxTolerance = 25;
     static final int liftMinPosition = 0;
     static final int liftMinTolerance = 25;
+    static final int liftAutoBoardPosition = 950;
+    static final int liftAutoCruisingPosition = 500;
 
     // Wrist settings
     static final double wristDownPosition = 0.4;

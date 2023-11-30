@@ -39,7 +39,6 @@ public abstract class AutoMaster extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        bot = new Bot(this, Constants.maxAutoSpeed);
         int riggingDirection;
         int boardDirection;
         int parkDirection;
@@ -49,6 +48,7 @@ public abstract class AutoMaster extends LinearOpMode {
 
         AprilTagProcessor aprilTagProcessor = null;
         VisionPortal visionPortal = null;
+        bot = new Bot(this, Constants.maxAutoSpeed);
 
         if (startPosition == StartPosition.FAR) {
             if (alliance == Alliance.BLUE) {
@@ -73,21 +73,22 @@ public abstract class AutoMaster extends LinearOpMode {
         } else {
             parkDirection = -boardDirection;
         }
-
+        bot.wristDown();
+        sleep(250);
         bot.grabberClose();
+        sleep(500);
+//        bot.liftStopAtPosition(100);
+        // Raise lift, raise wrist, close grabber
+        setToCruisingPosition();
 
         aprilTagProcessor = createAprilTagProcessor();
 
         visionPortal = createVisionPortal(Constants.atExposureMS, Constants.atExposureGain, aprilTagProcessor);
 
-        //       setManualExposure(Constants.atExposureMS, Constants.atExposureGain);  // Use low exposure time to reduce motion blur
+        sleep(1000);
 
         waitForStart();
 
-        // Raise lift, raise wrist, close grabber
-        setToCruisingPosition();
-
-        sleep(250);
 
         // Determine prop position, place the purple pixel on the spike mark, then go to escape position
         propPosition = dsPlacePurplePixel(riggingDirection);
@@ -111,9 +112,9 @@ public abstract class AutoMaster extends LinearOpMode {
     }
 
     protected void setToCruisingPosition() {
-        bot.wristUp();
         bot.grabberClose();
-        bot.liftStopAtPosition(550);
+        bot.wristUp();
+        bot.liftStopAtPosition(Constants.liftAutoCruisingPosition);
     }
 
     protected PropPosition dsPlacePurplePixel(int riggingDirection) {
@@ -281,15 +282,16 @@ public abstract class AutoMaster extends LinearOpMode {
     protected void placePixelOnBoard() {
         bot.moveStraightForDistance(Constants.boardApproachDistance);
         bot.strafeForDistance(-Constants.sensorToDrivetrainMiddle);
-        bot.liftStopAtPosition(950);
+        bot.liftStopAtPosition(Constants.liftAutoBoardPosition);
         bot.wristMiddle();
         bot.creepUntilContact();
-        bot.moveStraightForDistance(-1);
+        bot.moveStraightForDistance(-2);
         bot.wristUp();
-        bot.moveStraightForDistance(1);
-        sleep(250);
+        sleep(500);
+        bot.moveStraightForDistance(2);
+        sleep(500);
         bot.grabberOpen();
-        sleep(250);
+        sleep(500);
         bot.moveStraightForDistance(-Constants.boardEscapeDistance);
     }
 
@@ -301,26 +303,17 @@ public abstract class AutoMaster extends LinearOpMode {
         }
         strafeVector = 2.5 * Constants.sensorToDrivetrainMiddle;
 
-//        telemetry.addData("parkDirection: ", parkDirection);
-//        telemetry.update();
-//        sleep(5000);
-
-
         if (parkDirection > 0) {
             strafeVector = strafeVector + (4 - adjustedTagNumber) * Constants.distanceBetweenAprilTags;
-        } else
-        {
+        } else {
             strafeVector = -strafeVector - adjustedTagNumber * Constants.distanceBetweenAprilTags;
         }
-
-//        telemetry.addData("strafeVector: ", strafeVector);
-//        telemetry.update();
-//        sleep(5000);
 
         bot.strafeForDistance(strafeVector);
         bot.turnToHeading(boardDirection * 90);
         bot.moveStraightForDistance(-10);
         setStationaryPosition();
+        sleep(1000);
     }
 
     protected void setStationaryPosition() {
