@@ -26,7 +26,7 @@ public class AutoStrafeTest extends AutoMaster{
             waitForStart();
 
             // Raise lift, raise wrist, close grabber
-            setToCruisingPosition();
+            setToHighCruisingPosition();
 
             sleep(100);
 

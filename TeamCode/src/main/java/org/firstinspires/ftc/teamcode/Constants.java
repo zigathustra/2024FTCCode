@@ -39,20 +39,25 @@ public class Constants {
     static final int liftMinPosition = 0;
     static final int liftMinTolerance = 25;
     static final int liftAutoBoardPosition = 950;
-    static final int liftAutoCruisingPosition = 500;
+    static final int liftAutoHighCruisingPosition = 550;
+    static final int liftAutoLowCruisingPosition = 100;
 
     // Wrist settings
     static final double wristDownPosition = 0.4;
     static final double wristMiddlePosition = 0.5;
     static final double wristUpPosition = 0.95;
+
     // Grabber settings
     static final double grabberClosedPosition = 0.45;
     static final double grabberOpenPosition = 1.5;
 
+    // Launcher settings
+    static final double launcherLockedPosition = 1;
+    static final double launcherUnlockedPosition = 0;
+
     // Prop Detection Settings
     static final double dsDistanceToCenterOfSpikeMarks = 25.0;
     static final double dsPropDistanceThreshold = 14;
-
     static final double dsPlacementDistanceOffset = 5.5;
     static final double dsFarPositionStrafeDistance = 8;
     static final double dsMiddlePositionStrafeDistance = 4.5;

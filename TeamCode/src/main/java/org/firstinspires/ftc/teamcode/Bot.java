@@ -40,6 +40,7 @@ public class Bot {
     protected Lift lift = null;
     protected Servo wrist = null;
     protected Servo grabber = null;
+    protected Servo launcher = null;
     protected Rev2mDistanceSensor distanceSensor = null;
 
     protected TouchSensor touchSensor = null;
@@ -74,6 +75,9 @@ public class Bot {
 //        opMode.sleep (1000);
         grabber = opMode.hardwareMap.get(Servo.class, "grabber");
         grabber.setPosition(Constants.grabberClosedPosition);
+
+        launcher = opMode.hardwareMap.get(Servo.class, "launcher");
+        launcher.setPosition(Constants.launcherLockedPosition);
 //        opMode.telemetry.addData("d_sensor ", 1);
 //        opMode.telemetry.update();
 //        opMode.sleep (1000);
@@ -170,6 +174,10 @@ public class Bot {
     public void grabberClose() {
         grabber.setPosition(Constants.grabberClosedPosition);
     }
+
+    public void launcherLocked(){ launcher.setPosition(Constants.launcherLockedPosition);}
+
+    public void launcherUnlocked(){ launcher.setPosition(Constants.launcherUnlockedPosition);}
 
     public double getDistance() {
         double distance;

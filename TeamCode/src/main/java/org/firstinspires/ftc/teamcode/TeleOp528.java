@@ -59,6 +59,11 @@ public class TeleOp528 extends LinearOpMode {
             } else if (gamepad1.y) {
                 bot.wristDown();
             }
+            if(gamepad1.share && gamepad1.start) {
+                bot.launcherUnlocked();
+            } else if (gamepad1.right_bumper && gamepad1.left_bumper) {
+                bot.launcherLocked();
+            }
         }
     }
 }

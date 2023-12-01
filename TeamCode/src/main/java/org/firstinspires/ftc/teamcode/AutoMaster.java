@@ -26,9 +26,9 @@ enum Alliance {RED, BLUE}
 enum ParkPosition {CENTER, CORNER}
 
 public abstract class AutoMaster extends LinearOpMode {
-    private Alliance alliance;
-    private StartPosition startPosition;
-    private ParkPosition parkPosition;
+    protected Alliance alliance;
+    protected StartPosition startPosition;
+    protected ParkPosition parkPosition;
     protected Bot bot;
 
     public AutoMaster(Alliance alliance, StartPosition startPosition, ParkPosition parkPosition) {
@@ -42,7 +42,7 @@ public abstract class AutoMaster extends LinearOpMode {
         int riggingDirection;
         int boardDirection;
         int parkDirection;
-        double boardHeading;
+
         PropPosition propPosition;
         int targetAprilTagNumber;
 
@@ -50,36 +50,19 @@ public abstract class AutoMaster extends LinearOpMode {
         VisionPortal visionPortal = null;
         bot = new Bot(this, Constants.maxAutoSpeed);
 
-        if (startPosition == StartPosition.FAR) {
-            if (alliance == Alliance.BLUE) {
-                riggingDirection = -1;
-                boardDirection = -1;
-            } else {
-                riggingDirection = 1;
-                boardDirection = 1;
-            }
-        } else {
-            if (alliance == Alliance.BLUE) {
-                riggingDirection = 1;
-                boardDirection = -1;
-            } else {
-                riggingDirection = -1;
-                boardDirection = 1;
-            }
-        }
+        riggingDirection = determineRiggingDirection();
 
-        if (parkPosition == ParkPosition.CORNER) {
-            parkDirection = boardDirection;
-        } else {
-            parkDirection = -boardDirection;
-        }
+        boardDirection = determineBoardDirection(riggingDirection);
+
+        parkDirection = determineParkDirection(parkPosition, boardDirection);
+
         bot.wristDown();
         sleep(250);
         bot.grabberClose();
-        sleep(500);
-//        bot.liftStopAtPosition(100);
+        sleep(1000);
+
         // Raise lift, raise wrist, close grabber
-        setToCruisingPosition();
+        setToHighCruisingPosition();
 
         aprilTagProcessor = createAprilTagProcessor();
 
@@ -92,6 +75,8 @@ public abstract class AutoMaster extends LinearOpMode {
 
         // Determine prop position, place the purple pixel on the spike mark, then go to escape position
         propPosition = dsPlacePurplePixel(riggingDirection);
+
+        bot.turnToHeading(riggingDirection*-90);
 
         targetAprilTagNumber = aprilTagNumber(propPosition, boardDirection);
 
@@ -111,10 +96,41 @@ public abstract class AutoMaster extends LinearOpMode {
         setStationaryPosition();
     }
 
-    protected void setToCruisingPosition() {
+    protected int determineRiggingDirection() {
+        if (((startPosition == StartPosition.FAR) && (alliance == Alliance.BLUE)) ||
+        ((startPosition == StartPosition.NEAR) && (alliance == Alliance.RED))) {
+            return (-1);
+        } else{
+            return (1);
+        }
+    }
+
+    protected int determineBoardDirection(int riggingDirection) {
+        if (startPosition == StartPosition.FAR) {
+            return (riggingDirection);
+        } else {
+            return (-riggingDirection);
+        }
+    }
+
+    protected int determineParkDirection(ParkPosition parkPosition, int boardDirection) {
+        if (parkPosition == ParkPosition.CORNER) {
+            return (boardDirection);
+        } else {
+            return (-boardDirection);
+        }
+    }
+
+    protected void setToHighCruisingPosition() {
         bot.grabberClose();
         bot.wristUp();
-        bot.liftStopAtPosition(Constants.liftAutoCruisingPosition);
+        bot.liftStopAtPosition(Constants.liftAutoHighCruisingPosition);
+    }
+
+    protected void setToLowCruisingPosition() {
+        bot.grabberClose();
+        bot.wristUp();
+        bot.liftStopAtPosition(Constants.liftAutoLowCruisingPosition);
     }
 
     protected PropPosition dsPlacePurplePixel(int riggingDirection) {
@@ -124,7 +140,7 @@ public abstract class AutoMaster extends LinearOpMode {
         double farSeekStrafe = 11.5 - Constants.sensorToDrivetrainMiddle;
         double farSeekMove = 17.5;
         double farPushMove = 6;
-        double escapeMove = 12.5;
+        double escapeStrafe = 12.5;
         double middleSeekMove = 8;
         double middlePushMove = 8;
         double nearPushMove = 8;
@@ -140,8 +156,7 @@ public abstract class AutoMaster extends LinearOpMode {
             propPosition = PropPosition.FAR;
             bot.strafeForDistance(Constants.sensorToDrivetrainMiddle);
             pushPixel(farPushMove);
-            bot.turnToHeading(farHeading);
-            bot.moveStraightForDistance(escapeMove);
+            bot.strafeForDistance(-(riggingDirection * escapeStrafe));
         }
 
         // Scan for MIDDLE position
@@ -155,11 +170,10 @@ public abstract class AutoMaster extends LinearOpMode {
                 propPosition = PropPosition.MIDDLE;
                 pushPixel(middlePushMove);
                 bot.moveStraightForDistance(-middleSeekMove);
-                bot.turnToHeading(farHeading);
-                bot.moveStraightForDistance(escapeMove + farSeekStrafe + Constants.sensorToDrivetrainMiddle);
+                bot.strafeForDistance(-(riggingDirection * (escapeStrafe + farSeekStrafe + Constants.sensorToDrivetrainMiddle)));
             }
         }
-
+        setToLowCruisingPosition();
         if (propPosition == null) {
             // If object not yet found, assumed NEAR position
             propPosition = PropPosition.NEAR;
@@ -169,8 +183,7 @@ public abstract class AutoMaster extends LinearOpMode {
             bot.strafeForDistance(riggingDirection * Constants.sensorToDrivetrainMiddle);
             bot.turnToHeading(0);
             bot.moveStraightForDistance(-middleSeekMove);
-            bot.turnToHeading(farHeading);
-            bot.moveStraightForDistance(escapeMove + farSeekStrafe + Constants.sensorToDrivetrainMiddle);
+            bot.strafeForDistance(-(riggingDirection * (escapeStrafe + farSeekStrafe + Constants.sensorToDrivetrainMiddle)));
         }
         return (propPosition);
     }
@@ -200,18 +213,19 @@ public abstract class AutoMaster extends LinearOpMode {
         return (aprilTagNumber);
     }
 
-    protected void roughAlignToAprilTag(int boardDirection, int targetAprilTagNumber, StartPosition startPosition) {
+    protected void roughAlignToAprilTag(int boardDirection,
+                                        int targetAprilTagNumber, StartPosition startPosition) {
         double strafeVector = 0;
+        double chassisWidth = 2 * Constants.sensorToDrivetrainMiddle;
         if (boardDirection < 0) {
-            strafeVector = 2 * Constants.sensorToDrivetrainMiddle;
             if (startPosition == StartPosition.FAR) {
-
+                strafeVector = (targetAprilTagNumber -4 - 3) * Constants.distanceBetweenAprilTags;
             } else {
-                strafeVector = strafeVector + (targetAprilTagNumber - 4) * Constants.distanceBetweenAprilTags;
+                strafeVector = chassisWidth + (targetAprilTagNumber - 4) * Constants.distanceBetweenAprilTags;
             }
         } else {
             if (startPosition == StartPosition.FAR) {
-
+                strafeVector = chassisWidth + (6 - targetAprilTagNumber + 3) * Constants.distanceBetweenAprilTags;
             } else {
                 strafeVector = -(6 - targetAprilTagNumber) * Constants.distanceBetweenAprilTags;
             }
@@ -339,7 +353,8 @@ public abstract class AutoMaster extends LinearOpMode {
 
     //   Manually set the camera gain and exposure.
     //   This can only be called AFTER calling initAprilTag(), and only works for Webcams;
-    protected VisionPortal createVisionPortal(int exposureMS, int gain, AprilTagProcessor aprilTagProcessor) {
+    protected VisionPortal createVisionPortal(int exposureMS, int gain, AprilTagProcessor
+            aprilTagProcessor) {
         VisionPortal visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                 .addProcessor(aprilTagProcessor)
