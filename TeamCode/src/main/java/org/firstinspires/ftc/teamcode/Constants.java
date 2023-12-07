@@ -75,7 +75,7 @@ public class Constants {
 
     // Pixel placement settings
     static final double boardApproachDistance = 4;
-    static final double boardOffsetDistance = 8;
+    static final double boardOffsetDistance = 7.5;
     static final double boardEscapeDistance = 10;
 
     // Parking Settings

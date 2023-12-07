@@ -18,15 +18,15 @@ public class RedFarCenter528 extends AutoMaster {
         PropPosition propPosition;
         int targetAprilTagNumber;
 
-//        AprilTagProcessor aprilTagProcessor = null;
-//        VisionPortal visionPortal = null;
+        AprilTagProcessor aprilTagProcessor = null;
+        VisionPortal visionPortal = null;
         bot = new Bot(this, Constants.maxAutoSpeed);
 
         riggingDirection = determineRiggingDirection();
 
         boardDirection = determineBoardDirection(riggingDirection);
 
-//        parkDirection = determineParkDirection(parkPosition, boardDirection);
+        parkDirection = determineParkDirection(parkPosition, boardDirection);
 
         bot.wristDown();
         sleep(250);
@@ -36,9 +36,9 @@ public class RedFarCenter528 extends AutoMaster {
         // Raise lift, raise wrist, close grabber
         setToHighCruisingPosition();
 
-//        aprilTagProcessor = createAprilTagProcessor();
+        aprilTagProcessor = createAprilTagProcessor();
 
-//        visionPortal = createVisionPortal(Constants.atExposureMS, Constants.atExposureGain, aprilTagProcessor);
+        visionPortal = createVisionPortal(Constants.atExposureMS, Constants.atExposureGain, aprilTagProcessor);
 
         sleep(1000);
 
@@ -47,23 +47,23 @@ public class RedFarCenter528 extends AutoMaster {
         // Determine prop position, place the purple pixel on the spike mark, then go to escape position
         propPosition = dsPlacePurplePixel(riggingDirection);
         bot.turnToHeading(0);
-        bot.moveStraightForDistance(41);
+        bot.moveStraightForDistance(35);
         bot.turnToHeading(boardDirection * -90);
         bot.moveStraightForDistance(96);
 
-        targetAprilTagNumber = aprilTagNumber(propPosition, boardDirection);
+        targetAprilTagNumber = aprilTagNumber(propPosition, riggingDirection, boardDirection);
 
         roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
 
         // Correct strafe to directly face the target April Tag
-//        autoOrientToAprilTag(aprilTagProcessor, targetAprilTagNumber);
+        autoOrientToAprilTag(aprilTagProcessor, targetAprilTagNumber);
 
-//        bot.turnToHeading(boardDirection * -90);
+        bot.turnToHeading(boardDirection * -90);
 
-//        placePixelOnBoard();
+        placePixelOnBoard();
 
         // Move straight until close to the wall, turn, and parallel park
-//        park(boardDirection, targetAprilTagNumber, parkDirection);
+        park(boardDirection, targetAprilTagNumber, parkDirection);
 
 //        // Lower lift, lower wrist, open grabber
         setStationaryPosition();
