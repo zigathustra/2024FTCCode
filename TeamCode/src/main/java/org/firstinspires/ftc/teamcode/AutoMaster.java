@@ -134,11 +134,11 @@ public abstract class AutoMaster extends LinearOpMode {
         double farHeading = riggingDirection * 90;
         double farSeekStrafe = 11.5 - Constants.sensorToDrivetrainMiddle;
         double farSeekMove = 17.5;
-        double farPushMove = 6;
+        double farPushMove = 7;
         double escapeStrafe = 11.5;
         double middleSeekMove = 8;
         double middlePushMove = 8;
-        double nearPushMove = 8;
+        double nearPushMove = 5;
 
         if (riggingDirection > 0) {
             farSeekStrafe = farSeekStrafe + Constants.sensorToDrivetrainMiddle * 2;
@@ -222,9 +222,9 @@ public abstract class AutoMaster extends LinearOpMode {
         double chassisWidth = 2 * Constants.sensorToDrivetrainMiddle;
         if (boardDirection == -1) {
             if (startPosition == StartPosition.FAR) {
-                strafeVector = (targetAprilTagNumber - 4 - 3) * Constants.distanceBetweenAprilTags;
+                strafeVector = -((targetAprilTagNumber - 4 - 3) * Constants.distanceBetweenAprilTags);
             } else {
-                strafeVector = chassisWidth + (targetAprilTagNumber - 4) * Constants.distanceBetweenAprilTags;
+                strafeVector = chassisWidth + (targetAprilTagNumber - .6) * Constants.distanceBetweenAprilTags;
             }
         } else {
             if (startPosition == StartPosition.FAR) {
@@ -309,6 +309,7 @@ public abstract class AutoMaster extends LinearOpMode {
 //        bot.moveStraightForDistance(2);
 //        sleep(500);
         bot.grabberOpen();
+        bot.liftStopAtPosition(Constants.liftAutoBoardPosition + 100);
         sleep(500);
         bot.moveStraightForDistance(-Constants.boardEscapeDistance);
     }
@@ -322,13 +323,13 @@ public abstract class AutoMaster extends LinearOpMode {
         strafeVector = 2.5 * Constants.sensorToDrivetrainMiddle;
 
         if (parkDirection > 0) {
-            strafeVector = strafeVector + (4 - adjustedTagNumber) * Constants.distanceBetweenAprilTags;
+            strafeVector = strafeVector + (4.5 - adjustedTagNumber) * Constants.distanceBetweenAprilTags;
         } else {
             strafeVector = -strafeVector - adjustedTagNumber * Constants.distanceBetweenAprilTags;
         }
 
-        bot.strafeForDistance(strafeVector);
         bot.turnToHeading(boardDirection * 90);
+        bot.strafeForDistance(-strafeVector);
         bot.moveStraightForDistance(-14);
         setStationaryPosition();
         sleep(1000);

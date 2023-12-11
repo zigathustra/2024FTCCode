@@ -20,12 +20,12 @@ public class Constants {
     static final DcMotor.Direction drivetrainLeftRearDirection = DcMotor.Direction.REVERSE;
     static final DcMotor.Direction drivetrainRightFrontDirection = DcMotor.Direction.FORWARD;
     static final DcMotor.Direction drivetrainRightRearDirection = DcMotor.Direction.FORWARD;
-    static final double maxNormalSpeed = 0.8;
+    static final double maxNormalSpeed = 0.9;
     static final double maxCreepSpeed = 0.15;
-    static final double maxAutoSpeed = 0.5;
+    static final double maxAutoSpeed = 0.55;
     static final double autoTurnGain = 0.02;   // Larger is more responsive, but also less stable
     static final double autoDriveGain = 0.03;
-    static final double maxAutoStrafeSpeed = 0.5;
+    static final double maxAutoStrafeSpeed = 0.55;
     static final double maxAutoCorrectionDriveSpeed = 0.5; // Max driving speed for better distance accuracy
     static final double maxAutoCorrectionTurnSpeed = 0.5; // Max Turn speed to limit turn rate
     static final double autoHeadingThreshold = 0.5; // How close the heading must be to the target
@@ -58,7 +58,7 @@ public class Constants {
     // Prop Detection Settings
     static final double dsDistanceToCenterOfSpikeMarks = 25.0;
     static final double dsPropDistanceThreshold = 14;
-    static final double dsPlacementDistanceOffset = 5.5;
+    static final double dsPlacementDistanceOffset = 3.5;
     static final double dsFarPositionStrafeDistance = 8;
     static final double dsMiddlePositionStrafeDistance = 4.5;
     static final double dsNearPositionStrafeDistance = 12;
@@ -75,7 +75,7 @@ public class Constants {
 
     // Pixel placement settings
     static final double boardApproachDistance = 4;
-    static final double boardOffsetDistance = 7.5;
+    static final double boardOffsetDistance = 5;
     static final double boardEscapeDistance = 10;
 
     // Parking Settings
