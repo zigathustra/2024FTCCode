@@ -90,6 +90,12 @@ public class Bot {
         driveTrain.setRunWithoutEncoders();
     }
 
+    public double getHeading()
+    {
+        return driveTrain.getHeading();
+    };
+
+
     // Turn to a specified heading in degrees
     // 0 is straight ahead
     // > 0 is CCW

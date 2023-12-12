@@ -197,7 +197,7 @@ public class DriveTrain {
         return Range.clip(headingError * gain, -1, 1);
     }
 
-    private double getHeading() {
+    public double getHeading() {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 

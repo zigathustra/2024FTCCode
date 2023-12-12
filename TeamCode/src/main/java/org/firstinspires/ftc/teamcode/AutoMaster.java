@@ -10,6 +10,8 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -23,7 +25,7 @@ enum StartPosition {FAR, NEAR}
 enum Alliance {RED, BLUE}
 
 // Target parking position
-enum ParkPosition {CENTER, CORNER}
+enum ParkPosition {CENTER, CORNER, NONE}
 
 public abstract class AutoMaster extends LinearOpMode {
     protected Alliance alliance;
@@ -31,7 +33,7 @@ public abstract class AutoMaster extends LinearOpMode {
     protected ParkPosition parkPosition;
     protected Bot bot;
 
-    public AutoMaster(Alliance alliance, StartPosition startPosition, ParkPosition parkPosition) {
+    protected AutoMaster(Alliance alliance, StartPosition startPosition, ParkPosition parkPosition) {
         this.alliance = alliance;
         this.startPosition = startPosition;
         this.parkPosition = parkPosition;
@@ -69,11 +71,16 @@ public abstract class AutoMaster extends LinearOpMode {
         // Determine prop position, place the purple pixel on the spike mark, then go to escape position
         propPosition = dsPlacePurplePixel(riggingDirection);
 
-        bot.turnToHeading(riggingDirection * 90);
+        roughTravelToBoard(boardDirection, riggingDirection);
 
         targetAprilTagNumber = aprilTagNumber(propPosition, riggingDirection, boardDirection);
-
+//        telemetry.addData("roughAlign: ",propPosition);
+//        telemetry.update();
+//        sleep(2500);
         roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
+//        telemetry.addData("autoOrient: ",targetAprilTagNumber);
+//        telemetry.update();
+//        sleep(2500);
 
         // Correct strafe to directly face the target April Tag
         autoOrientToAprilTag(aprilTagProcessor, targetAprilTagNumber);
@@ -109,8 +116,10 @@ public abstract class AutoMaster extends LinearOpMode {
     protected int determineParkDirection(ParkPosition parkPosition, int boardDirection) {
         if (parkPosition == ParkPosition.CORNER) {
             return (boardDirection);
-        } else {
+        } else if (parkPosition == ParkPosition.CENTER) {
             return (-boardDirection);
+        } else {
+            return (0);
         }
     }
 
@@ -188,6 +197,10 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.moveStraightForDistance(-(distance + Constants.dsPlacementDistanceOffset));
     }
 
+    protected void roughTravelToBoard(int boardPosition, int riggingDirection) {
+        bot.turnToHeading(riggingDirection * 90);
+    }
+
     protected int aprilTagNumber(PropPosition propPosition, int riggingDirection, int boardDirection) {
         int aprilTagNumber;
 
@@ -237,6 +250,10 @@ public abstract class AutoMaster extends LinearOpMode {
     }
 
     protected void autoOrientToAprilTag(AprilTagProcessor aprilTagProcessor, int targetTagNumber) {
+//        telemetry.addData("Target: ",targetTagNumber);
+//        telemetry.update();
+//        sleep(500);
+
         AprilTagDetection targetTag;
         boolean targetFound;
         double strafeError;
@@ -250,9 +267,18 @@ public abstract class AutoMaster extends LinearOpMode {
             targetFound = false;
             targetTag = null;
 
+//            telemetry.addData("strafePower: ",strafePower);
+//            telemetry.addData("yawPower: ",yawPower);
+//            telemetry.update();
+//            sleep(500);
+
             // Search through detected tags to find the target tag
             List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
             for (AprilTagDetection detection : currentDetections) {
+//                telemetry.addData("Iter Detections: ", targetFound);
+//                telemetry.update();
+//                sleep(100);
+
                 // Look to see if we have size info on this tag
                 if (detection.metadata != null) {
                     //  Check to see if we want to track towards this tag
@@ -289,12 +315,13 @@ public abstract class AutoMaster extends LinearOpMode {
                 telemetry.addData("Auto", "Strafe %5.2f", strafePower);
                 telemetry.addData("Auto", "Yaw %5.2f", yawPower);
             }
-            telemetry.update();
-            // Apply desired axes motions to the drivetrain.
-            bot.moveDirection(0, strafePower, yawPower);
-            sleep(10);
         }
+        telemetry.update();
+        // Apply desired axes motions to the drivetrain.
+        bot.moveDirection(0, strafePower, yawPower);
+        sleep(10);
     }
+
 
     protected void placePixelOnBoard() {
         bot.moveStraightForDistance(Constants.boardApproachDistance);
@@ -309,8 +336,9 @@ public abstract class AutoMaster extends LinearOpMode {
 //        bot.moveStraightForDistance(2);
 //        sleep(500);
         bot.grabberOpen();
-        bot.liftStopAtPosition(Constants.liftAutoBoardPosition + 100);
-        sleep(500);
+        sleep(250);
+        bot.liftStopAtPosition(Constants.liftAutoBoardPosition + 150);
+        sleep(250);
         bot.moveStraightForDistance(-Constants.boardEscapeDistance);
     }
 
@@ -332,10 +360,12 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.strafeForDistance(-strafeVector);
         bot.moveStraightForDistance(-14);
         setStationaryPosition();
-        sleep(1000);
+        sleep(2500);
     }
 
     protected void setStationaryPosition() {
+        bot.grabberClose();
+        sleep(100);
         bot.wristDown();
         bot.liftStopAtPosition(0);
     }
