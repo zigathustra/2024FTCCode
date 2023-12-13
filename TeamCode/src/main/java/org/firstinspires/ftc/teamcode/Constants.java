@@ -22,10 +22,10 @@ public class Constants {
     static final DcMotor.Direction drivetrainRightRearDirection = DcMotor.Direction.FORWARD;
     static final double maxNormalSpeed = 0.9;
     static final double maxCreepSpeed = 0.15;
-    static final double maxAutoSpeed = 0.55;
+    static final double maxAutoSpeed = 0.7;
     static final double autoTurnGain = 0.02;   // Larger is more responsive, but also less stable
     static final double autoDriveGain = 0.03;
-    static final double maxAutoStrafeSpeed = 0.55;
+    static final double maxAutoStrafeSpeed = 0.7;
     static final double maxAutoCorrectionDriveSpeed = 0.5; // Max driving speed for better distance accuracy
     static final double maxAutoCorrectionTurnSpeed = 0.5; // Max Turn speed to limit turn rate
     static final double autoHeadingThreshold = 0.5; // How close the heading must be to the target

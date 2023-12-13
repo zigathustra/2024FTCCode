@@ -29,7 +29,6 @@ public class FarNoBoard extends AutoMaster {
 
     protected void park(double boardDirection, int targetAprilTagNumber, double parkDirection)
     {
-
     }
 }
 

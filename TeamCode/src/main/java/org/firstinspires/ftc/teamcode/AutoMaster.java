@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.System.exit;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.Range;
 
@@ -44,6 +46,7 @@ public abstract class AutoMaster extends LinearOpMode {
         int riggingDirection;
         int boardDirection;
         int parkDirection;
+        ElapsedTime runTimer = new ElapsedTime();
 
         PropPosition propPosition;
         int targetAprilTagNumber;
@@ -67,6 +70,7 @@ public abstract class AutoMaster extends LinearOpMode {
         sleep(1000);
 
         waitForStart();
+        runTimer.reset();
 
         // Determine prop position, place the purple pixel on the spike mark, then go to escape position
         propPosition = dsPlacePurplePixel(riggingDirection);
@@ -77,23 +81,37 @@ public abstract class AutoMaster extends LinearOpMode {
 //        telemetry.addData("roughAlign: ",propPosition);
 //        telemetry.update();
 //        sleep(2500);
-        roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
-//        telemetry.addData("autoOrient: ",targetAprilTagNumber);
-//        telemetry.update();
-//        sleep(2500);
 
-        // Correct strafe to directly face the target April Tag
-        autoOrientToAprilTag(aprilTagProcessor, targetAprilTagNumber);
+        roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
+//        telemetry.addData("autoOrient Time: ",runTimer.time());
+//        telemetry.update();
+        if (runTimer.time() <= 15)
+        {
+            // Correct strafe to directly face the target April Tag
+            autoOrientToAprilTag(aprilTagProcessor, targetAprilTagNumber);
+        }
 
         bot.turnToHeading(boardDirection * -90);
+//        telemetry.addData("place Time: ",runTimer.time());
+//        telemetry.update();
 
-        placePixelOnBoard();
+        if (runTimer.time() <=  20)
+        {            // Correct strafe to directly face the target April Tag
+            placePixelOnBoard();
+        }
+//        telemetry.addData("start park Time: ",runTimer.time());
+//        telemetry.update();
+//        sleep(1000);
 
-        // Move straight until close to the wall, turn, and parallel park
-        park(boardDirection, targetAprilTagNumber, parkDirection);
-
+        if (runTimer.time() <= 24)
+        {
+            park(boardDirection, targetAprilTagNumber, parkDirection);
+        }
+//        telemetry.addData("finish park Time: ",runTimer.time());
+//        telemetry.update();
+//        sleep(1000);
         // Lower lift, lower wrist, open grabber
-        setStationaryPosition();
+        shutdown();
     }
 
     protected int determineRiggingDirection() {
@@ -147,7 +165,7 @@ public abstract class AutoMaster extends LinearOpMode {
         double escapeStrafe = 11.5;
         double middleSeekMove = 8;
         double middlePushMove = 8;
-        double nearPushMove = 5;
+        double nearPushMove = 6;
 
         if (riggingDirection > 0) {
             farSeekStrafe = farSeekStrafe + Constants.sensorToDrivetrainMiddle * 2;
@@ -262,8 +280,19 @@ public abstract class AutoMaster extends LinearOpMode {
         double yawPower = 1;
         double minStrafePower = .01;
         double minYawPower = .01;
+        double currentHeading = 0;
+        double startHeading = bot.getHeading();
+        double maxScanHeading = startHeading + 15;
+        double minScanHeading = startHeading - 15;
+        ElapsedTime scanTimer = new ElapsedTime();
+        double scanDuration = 4;
+        double yawSearchPower = .15;
+        double scanDirection = 1;
 
-        while ((Math.abs(strafePower) > minStrafePower) || (Math.abs(yawPower) > minYawPower)) {
+        scanTimer.reset();
+
+        while (((Math.abs(strafePower) > minStrafePower) || (Math.abs(yawPower) > minYawPower))
+                && (scanTimer.time() < scanDuration)) {
             targetFound = false;
             targetTag = null;
 
@@ -314,14 +343,24 @@ public abstract class AutoMaster extends LinearOpMode {
 
                 telemetry.addData("Auto", "Strafe %5.2f", strafePower);
                 telemetry.addData("Auto", "Yaw %5.2f", yawPower);
+            } else {
+                strafePower = 0;
+                currentHeading = bot.getHeading();
+                if (currentHeading <= minScanHeading) {
+                    scanDirection = 1;
+                }
+                if (currentHeading >= maxScanHeading)
+                {
+                    scanDirection = -1;
+                }
+                yawPower = scanDirection * yawSearchPower;
             }
+            telemetry.update();
+            // Apply desired axes motions to the drivetrain.
+            bot.moveDirection(0, strafePower, yawPower);
+            sleep(10);
         }
-        telemetry.update();
-        // Apply desired axes motions to the drivetrain.
-        bot.moveDirection(0, strafePower, yawPower);
-        sleep(10);
     }
-
 
     protected void placePixelOnBoard() {
         bot.moveStraightForDistance(Constants.boardApproachDistance);
@@ -359,15 +398,15 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.turnToHeading(boardDirection * 90);
         bot.strafeForDistance(-strafeVector);
         bot.moveStraightForDistance(-14);
-        setStationaryPosition();
-        sleep(2500);
     }
 
-    protected void setStationaryPosition() {
+    protected void shutdown() {
         bot.grabberClose();
         sleep(100);
         bot.wristDown();
         bot.liftStopAtPosition(0);
+        sleep(2500);
+        exit(1);
     }
 
     protected AprilTagProcessor createAprilTagProcessor() {
