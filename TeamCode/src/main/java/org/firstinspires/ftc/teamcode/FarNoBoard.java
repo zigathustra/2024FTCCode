@@ -19,7 +19,7 @@ public class FarNoBoard extends AutoMaster {
     }
 
     @Override
-    protected void autoOrientToAprilTag(AprilTagProcessor aprilTagProcessor, int targetTagNumber)
+    protected void autoOrientToAprilTag(AprilTagProcessor aprilTagProcessor, int targetTagNumber, int boardDirection)
     {
     }
     @Override

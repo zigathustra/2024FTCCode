@@ -88,10 +88,10 @@ public abstract class AutoMaster extends LinearOpMode {
         if (runTimer.time() <= 15)
         {
             // Correct strafe to directly face the target April Tag
-            autoOrientToAprilTag(aprilTagProcessor, targetAprilTagNumber);
+            autoOrientToAprilTag(aprilTagProcessor, targetAprilTagNumber, boardDirection);
         }
 
-        bot.turnToHeading(boardDirection * -90);
+//        bot.turnToHeading(boardDirection * -90);
 //        telemetry.addData("place Time: ",runTimer.time());
 //        telemetry.update();
 
@@ -111,7 +111,7 @@ public abstract class AutoMaster extends LinearOpMode {
 //        telemetry.update();
 //        sleep(1000);
         // Lower lift, lower wrist, open grabber
-        shutdown();
+        setToTeleopStartingPosition();
     }
 
     protected int determineRiggingDirection() {
@@ -162,7 +162,7 @@ public abstract class AutoMaster extends LinearOpMode {
         double farSeekStrafe = 11.5 - Constants.sensorToDrivetrainMiddle;
         double farSeekMove = 17.5;
         double farPushMove = 7;
-        double escapeStrafe = 11.5;
+        double escapeStrafe = 23;
         double middleSeekMove = 8;
         double middlePushMove = 8;
         double nearPushMove = 6;
@@ -178,7 +178,7 @@ public abstract class AutoMaster extends LinearOpMode {
             propPosition = PropPosition.FAR;
             bot.strafeForDistance(Constants.sensorToDrivetrainMiddle);
             pushPixel(farPushMove);
-            bot.strafeForDistance(-(riggingDirection * escapeStrafe));
+            bot.strafeForDistance(-(riggingDirection * (escapeStrafe - farSeekStrafe + riggingDirection * Constants.sensorToDrivetrainMiddle)));
         }
 
         // Scan for MIDDLE position
@@ -192,7 +192,7 @@ public abstract class AutoMaster extends LinearOpMode {
                 propPosition = PropPosition.MIDDLE;
                 pushPixel(middlePushMove);
                 bot.moveStraightForDistance(-middleSeekMove);
-                bot.strafeForDistance(-(riggingDirection * (escapeStrafe + farSeekStrafe)));
+                bot.strafeForDistance(-(riggingDirection * escapeStrafe));
             }
         }
         setToLowCruisingPosition();
@@ -205,7 +205,7 @@ public abstract class AutoMaster extends LinearOpMode {
             bot.strafeForDistance(riggingDirection * Constants.sensorToDrivetrainMiddle);
             bot.turnToHeading(0);
             bot.moveStraightForDistance(-middleSeekMove);
-            bot.strafeForDistance(-(riggingDirection * (escapeStrafe + farSeekStrafe)));
+            bot.strafeForDistance(-(riggingDirection * escapeStrafe));
         }
         return (propPosition);
     }
@@ -267,13 +267,13 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.strafeForDistance(strafeVector);
     }
 
-    protected void autoOrientToAprilTag(AprilTagProcessor aprilTagProcessor, int targetTagNumber) {
+    protected void autoOrientToAprilTag(AprilTagProcessor aprilTagProcessor, int targetTagNumber, int boardDirection) {
 //        telemetry.addData("Target: ",targetTagNumber);
 //        telemetry.update();
 //        sleep(500);
 
         AprilTagDetection targetTag;
-        boolean targetFound;
+        boolean targetFound = false;
         double strafeError;
         double yawError;
         double strafePower = 1;
@@ -360,6 +360,9 @@ public abstract class AutoMaster extends LinearOpMode {
             bot.moveDirection(0, strafePower, yawPower);
             sleep(10);
         }
+        if (!targetFound){
+            bot.turnToHeading(boardDirection * -90);
+        }
     }
 
     protected void placePixelOnBoard() {
@@ -400,13 +403,12 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.moveStraightForDistance(-14);
     }
 
-    protected void shutdown() {
+    protected void setToTeleopStartingPosition() {
         bot.grabberClose();
         sleep(100);
         bot.wristDown();
         bot.liftStopAtPosition(0);
         sleep(2500);
-        exit(1);
     }
 
     protected AprilTagProcessor createAprilTagProcessor() {

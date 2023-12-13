@@ -20,7 +20,7 @@ public class Constants {
     static final DcMotor.Direction drivetrainLeftRearDirection = DcMotor.Direction.REVERSE;
     static final DcMotor.Direction drivetrainRightFrontDirection = DcMotor.Direction.FORWARD;
     static final DcMotor.Direction drivetrainRightRearDirection = DcMotor.Direction.FORWARD;
-    static final double maxNormalSpeed = 0.9;
+    static final double maxNormalSpeed = 0.8;
     static final double maxCreepSpeed = 0.15;
     static final double maxAutoSpeed = 0.7;
     static final double autoTurnGain = 0.02;   // Larger is more responsive, but also less stable
