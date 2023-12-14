@@ -78,33 +78,19 @@ public abstract class AutoMaster extends LinearOpMode {
         roughTravelToBoard(boardDirection, riggingDirection);
 
         targetAprilTagNumber = aprilTagNumber(propPosition, riggingDirection, boardDirection);
-//        telemetry.addData("roughAlign: ",propPosition);
-//        telemetry.update();
-//        sleep(2500);
 
         roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
-//        telemetry.addData("autoOrient Time: ",runTimer.time());
-//        telemetry.update();
-        if (runTimer.time() <= 15)
-        {
+
+        if (runTimer.time() <= orientMaxTime()) {
             // Correct strafe to directly face the target April Tag
             autoOrientToAprilTag(aprilTagProcessor, targetAprilTagNumber, boardDirection);
         }
 
-//        bot.turnToHeading(boardDirection * -90);
-//        telemetry.addData("place Time: ",runTimer.time());
-//        telemetry.update();
-
-        if (runTimer.time() <=  20)
-        {            // Correct strafe to directly face the target April Tag
+        if (runTimer.time() <= placeMaxTime()) {            // Correct strafe to directly face the target April Tag
             placePixelOnBoard();
         }
-//        telemetry.addData("start park Time: ",runTimer.time());
-//        telemetry.update();
-//        sleep(1000);
 
-        if (runTimer.time() <= 24)
-        {
+        if (runTimer.time() <= parkMaxTime()) {
             park(boardDirection, targetAprilTagNumber, parkDirection);
         }
 //        telemetry.addData("finish park Time: ",runTimer.time());
@@ -121,6 +107,18 @@ public abstract class AutoMaster extends LinearOpMode {
         } else {
             return (1);
         }
+    }
+
+    protected double orientMaxTime() {
+        return (15);
+    }
+
+    protected double placeMaxTime() {
+        return (20);
+    }
+
+    protected double parkMaxTime() {
+        return (24);
     }
 
     protected int determineBoardDirection(int riggingDirection) {
@@ -253,13 +251,13 @@ public abstract class AutoMaster extends LinearOpMode {
         double chassisWidth = 2 * Constants.sensorToDrivetrainMiddle;
         if (boardDirection == -1) {
             if (startPosition == StartPosition.FAR) {
-                strafeVector = -((targetAprilTagNumber - 4 - 3) * Constants.distanceBetweenAprilTags);
+                strafeVector = -((targetAprilTagNumber - 4 - 2) * Constants.distanceBetweenAprilTags);
             } else {
                 strafeVector = chassisWidth + (targetAprilTagNumber - .6) * Constants.distanceBetweenAprilTags;
             }
         } else {
             if (startPosition == StartPosition.FAR) {
-                strafeVector = chassisWidth + (targetAprilTagNumber - 4 + 3) * Constants.distanceBetweenAprilTags;
+                strafeVector = chassisWidth + (targetAprilTagNumber - 4 + 2) * Constants.distanceBetweenAprilTags;
             } else {
                 strafeVector = -(6 - targetAprilTagNumber) * Constants.distanceBetweenAprilTags;
             }
@@ -349,8 +347,7 @@ public abstract class AutoMaster extends LinearOpMode {
                 if (currentHeading <= minScanHeading) {
                     scanDirection = 1;
                 }
-                if (currentHeading >= maxScanHeading)
-                {
+                if (currentHeading >= maxScanHeading) {
                     scanDirection = -1;
                 }
                 yawPower = scanDirection * yawSearchPower;
@@ -360,7 +357,7 @@ public abstract class AutoMaster extends LinearOpMode {
             bot.moveDirection(0, strafePower, yawPower);
             sleep(10);
         }
-        if (!targetFound){
+        if (!targetFound) {
             bot.turnToHeading(boardDirection * -90);
         }
     }
@@ -372,11 +369,6 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.wristUp();
         sleep(500);
         bot.creepStraightForDistance(bot.getDistance() - Constants.boardOffsetDistance);
-//        bot.wristMiddle();
-//        bot.creepUntilContact();
-//        bot.moveStraightForDistance(-2);
-//        bot.moveStraightForDistance(2);
-//        sleep(500);
         bot.grabberOpen();
         sleep(250);
         bot.liftStopAtPosition(Constants.liftAutoBoardPosition + 150);
