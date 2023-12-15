@@ -11,6 +11,7 @@ public class FarNoBoard extends AutoMaster {
     @Override
     protected void roughTravelToBoard(int boardDirection, int rigginDirection)
     {
+        bot.moveStraightForDistance(12);
     }
 
     @Override

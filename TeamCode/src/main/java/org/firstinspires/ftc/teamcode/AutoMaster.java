@@ -163,7 +163,7 @@ public abstract class AutoMaster extends LinearOpMode {
         double escapeStrafe = 23;
         double middleSeekMove = 8;
         double middlePushMove = 8;
-        double nearPushMove = 6;
+        double nearPushMove = 5.5;
 
         if (riggingDirection > 0) {
             farSeekStrafe = farSeekStrafe + Constants.sensorToDrivetrainMiddle * 2;
@@ -203,7 +203,7 @@ public abstract class AutoMaster extends LinearOpMode {
             bot.strafeForDistance(riggingDirection * Constants.sensorToDrivetrainMiddle);
             bot.turnToHeading(0);
             bot.moveStraightForDistance(-middleSeekMove);
-            bot.strafeForDistance(-(riggingDirection * escapeStrafe));
+            bot.strafeForDistance(-(riggingDirection * (escapeStrafe - 2)));
         }
         return (propPosition);
     }
@@ -251,7 +251,7 @@ public abstract class AutoMaster extends LinearOpMode {
         double chassisWidth = 2 * Constants.sensorToDrivetrainMiddle;
         if (boardDirection == -1) {
             if (startPosition == StartPosition.FAR) {
-                strafeVector = -((targetAprilTagNumber - 4 - 2) * Constants.distanceBetweenAprilTags);
+                strafeVector = (targetAprilTagNumber - 4 - 1.2) * Constants.distanceBetweenAprilTags;
             } else {
                 strafeVector = chassisWidth + (targetAprilTagNumber - .6) * Constants.distanceBetweenAprilTags;
             }
@@ -397,8 +397,9 @@ public abstract class AutoMaster extends LinearOpMode {
 
     protected void setToTeleopStartingPosition() {
         bot.grabberClose();
-        sleep(100);
+        bot.liftStopAtPosition(Constants.liftAutoHighCruisingPosition);
         bot.wristDown();
+        sleep(250);
         bot.liftStopAtPosition(0);
         sleep(2500);
     }

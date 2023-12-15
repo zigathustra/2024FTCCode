@@ -30,7 +30,6 @@ public class FarBoard extends AutoMaster {
 
     protected void autoOrientToAprilTag(AprilTagProcessor aprilTagProcessor, int targetTagNumber, int boardDirection)
     {
-
     }
     protected void park(double boardDirection, int targetAprilTagNumber, double parkDirection)
     {
