@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode;
-
-import static java.lang.System.exit;
+package org.firstinspires.ftc.teamcode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.Range;
@@ -8,6 +6,8 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.teamcode.common.Bot;
+import org.firstinspires.ftc.teamcode.common.Constants;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -17,17 +17,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-// Possible positions for the prop relative to the rigging
-// Used to invert the prop search order for blue vs red
-enum PropPosition {NEAR, MIDDLE, FAR}
-
-// Starting position for the bot
-enum StartPosition {FAR, NEAR}
-
-enum Alliance {RED, BLUE}
-
-// Target parking position
-enum ParkPosition {CENTER, CORNER, NONE}
+import org.firstinspires.ftc.teamcode.common.*;
 
 public abstract class AutoMaster extends LinearOpMode {
     protected Alliance alliance;

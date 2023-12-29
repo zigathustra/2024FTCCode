@@ -1,7 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.teleop.TeleOpBot;
 
 @TeleOp(name = "TeleoOp528", group = "Linear OpMode")
 public class TeleOp528 extends LinearOpMode {

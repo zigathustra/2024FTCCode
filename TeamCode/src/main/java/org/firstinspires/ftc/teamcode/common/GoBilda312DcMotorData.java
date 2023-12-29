@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.common;
 public class GoBilda312DcMotorData {
     public static double countsPerMotorRev = 28;
     public static double gearRatio = 19.2;
