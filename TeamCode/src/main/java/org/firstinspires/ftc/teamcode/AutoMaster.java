@@ -61,16 +61,19 @@ public abstract class AutoMaster extends LinearOpMode {
 
         parkDirection = determineParkDirection(parkPosition, boardDirection);
 
-        bot.wristDown();
-        setToHighCruisingPosition();
         aprilTagProcessor = createAprilTagProcessor();
 
         visionPortal = createVisionPortal(Constants.atExposureMS, Constants.atExposureGain, aprilTagProcessor);
 
         sleep(1000);
 
+        bot.wristDown();
+        bot.grabberClose();
+        sleep(1000);
+
         waitForStart();
         runTimer.reset();
+        setToHighCruisingPosition();
 
         // Determine prop position, place the purple pixel on the spike mark, then go to escape position
         propPosition = dsPlacePurplePixel(riggingDirection);
@@ -140,10 +143,8 @@ public abstract class AutoMaster extends LinearOpMode {
     }
 
     protected void setToHighCruisingPosition() {
-        bot.grabberClose();
-        sleep(1000);
         bot.liftStopAtPosition(Constants.liftAutoHighCruisingPosition);
-        sleep(1000);
+        sleep(500);
         bot.wristUp();
     }
 
@@ -367,7 +368,7 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.strafeForDistance(-Constants.sensorToDrivetrainMiddle);
         bot.liftStopAtPosition(Constants.liftAutoBoardPosition);
         bot.wristUp();
-        sleep(500);
+//        sleep(500);
         bot.creepStraightForDistance(bot.getDistance() - Constants.boardOffsetDistance);
         bot.grabberOpen();
         sleep(250);
