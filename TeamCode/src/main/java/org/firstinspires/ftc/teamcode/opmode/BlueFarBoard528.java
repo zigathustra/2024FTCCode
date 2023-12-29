@@ -1,10 +1,8 @@
-package org.firstinspires.ftc.teamcode.opModes;
+package org.firstinspires.ftc.teamcode.opmode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.common.Alliance;
-import org.firstinspires.ftc.teamcode.common.ParkPosition;
-import org.firstinspires.ftc.teamcode.common.StartPosition;
 
 import org.firstinspires.ftc.teamcode.auto.FarBoard;
 
