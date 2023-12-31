@@ -60,6 +60,9 @@ public class Constants {
     public static final double dsFarPositionStrafeDistance = 8;
     public static final double dsMiddlePositionStrafeDistance = 4.5;
     public static final double dsNearPositionStrafeDistance = 12;
+    public static final int dsExposureMS = 6;
+    public static final int dsExposureGain = 250;
+
 
     // April Tag Detection Settings
     public static final double atAxialGain = 0.02;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
