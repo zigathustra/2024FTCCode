@@ -1,12 +1,13 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.java.auto;
 
 import org.firstinspires.ftc.teamcode.common.Alliance;
 import org.firstinspires.ftc.teamcode.common.ParkPosition;
 import org.firstinspires.ftc.teamcode.common.StartPosition;
+import org.firstinspires.ftc.teamcode.common.VisionSensor;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-public class FarNoBoard extends AutoMaster {
+public class FarNoBoard extends org.firstinspires.ftc.teamcode.java.auto.AutoMaster {
     public FarNoBoard(Alliance alliance)
     {
         super(alliance, StartPosition.FAR, ParkPosition.NONE);
@@ -24,7 +25,7 @@ public class FarNoBoard extends AutoMaster {
     }
 
     @Override
-    protected void autoOrientToAprilTag(AprilTagProcessor aprilTagProcessor, int targetTagNumber, int boardDirection)
+    protected void autoOrientToAprilTag(VisionSensor visionSensor, int targetTagNumber, int boardDirection)
     {
     }
     @Override

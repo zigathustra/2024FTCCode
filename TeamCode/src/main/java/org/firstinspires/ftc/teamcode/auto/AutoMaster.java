@@ -1,29 +1,25 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.java.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.common.Bot;
 import org.firstinspires.ftc.teamcode.common.Constants;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.firstinspires.ftc.teamcode.common.*;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 public abstract class AutoMaster extends LinearOpMode {
     protected Alliance alliance;
     protected StartPosition startPosition;
     protected ParkPosition parkPosition;
     protected Bot bot;
+
+    protected VisionSensor visionSensor;
 
     protected AutoMaster(Alliance alliance, StartPosition startPosition, ParkPosition parkPosition) {
         this.alliance = alliance;
@@ -36,14 +32,13 @@ public abstract class AutoMaster extends LinearOpMode {
         int riggingDirection;
         int boardDirection;
         int parkDirection;
+        PropDirection propDirection = PropDirection.CENTER;
+        int targetAprilTagNumber;
         ElapsedTime runTimer = new ElapsedTime();
 
-        PropPosition propPosition;
-        int targetAprilTagNumber;
-
-        AprilTagProcessor aprilTagProcessor = null;
-        VisionPortal visionPortal = null;
         bot = new Bot(this, Constants.maxAutoSpeed);
+
+        visionSensor = new VisionSensor(this, alliance);
 
         riggingDirection = determineRiggingDirection();
 
@@ -51,32 +46,43 @@ public abstract class AutoMaster extends LinearOpMode {
 
         parkDirection = determineParkDirection(parkPosition, boardDirection);
 
-        aprilTagProcessor = createAprilTagProcessor();
-
-        visionPortal = createVisionPortal(Constants.atExposureMS, Constants.atExposureGain, aprilTagProcessor);
-
-        sleep(1000);
+        visionSensor.goToPropDetectionMode();
 
         bot.wristDown();
         bot.grabberClose();
         sleep(1000);
 
-        waitForStart();
-        runTimer.reset();
-        setToHighCruisingPosition();
+        while ((!isStarted() && (!isStopRequested()))) {
+            propDirection = visionSensor.getPropDirection();
 
-        // Determine prop position, place the purple pixel on the spike mark, then go to escape position
-        propPosition = dsPlacePurplePixel(riggingDirection);
+            telemetry.addData("Prop Position: ", propDirection);
+            telemetry.update();
+
+            // Don't burn CPU cycles busy-looping in this sample
+            sleep(50);
+        }
+        runTimer.reset();
+        visionSensor.goToNoSensingMode();
+        setToLowCruisingPosition();
+
+        // Move forward to escape position
+        bot.moveStraightForDistance(Constants.pdDistanceToEscapePosition);
+
+        // Place pixel on correct spike mark and return to escape position
+        // Use propDirection determined using webcam during init
+        placePropPixel(propDirection);
 
         roughTravelToBoard(boardDirection, riggingDirection);
 
-        targetAprilTagNumber = aprilTagNumber(propPosition, riggingDirection, boardDirection);
+        visionSensor.goToAprilTagDetectionMode();
+
+        targetAprilTagNumber = visionSensor.getTargetAprilTagNumber(alliance);
 
         roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
 
         if (runTimer.time() <= orientMaxTime()) {
             // Correct strafe to directly face the target April Tag
-            autoOrientToAprilTag(aprilTagProcessor, targetAprilTagNumber, boardDirection);
+            autoOrientToAprilTag(visionSensor, targetAprilTagNumber, boardDirection);
         }
 
         if (runTimer.time() <= placeMaxTime()) {            // Correct strafe to directly face the target April Tag
@@ -144,97 +150,28 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.liftStopAtPosition(Constants.liftAutoLowCruisingPosition);
     }
 
-    protected PropPosition dsPlacePurplePixel(int riggingDirection) {
-        double propDistance;
-        PropPosition propPosition = null;
-        double farHeading = riggingDirection * 90;
-        double farSeekStrafe = 11.5 - Constants.sensorToDrivetrainMiddle;
-        double farSeekMove = 17.5;
-        double farPushMove = 7;
-        double escapeStrafe = 23;
-        double middleSeekMove = 8;
-        double middlePushMove = 8;
-        double nearPushMove = 5.5;
 
-        if (riggingDirection > 0) {
-            farSeekStrafe = farSeekStrafe + Constants.sensorToDrivetrainMiddle * 2;
+    protected void placePropPixel(PropDirection propDirection) {
+        double distance = Constants.pdCenterPlacementDistance;
+        double heading = Constants.pdCenterHeading;
+
+        if (propDirection == PropDirection.LEFT) {
+            distance = Constants.pdLeftPlacementDistance;
+            heading = Constants.pdLeftHeading;
+        } else if (propDirection == PropDirection.CENTER) {
+            distance = Constants.pdRightPlacementDistance;
+            heading = Constants.pdRightHeading;
         }
 
-        // Scan for FAR position
-        bot.moveStraightForDistance(farSeekMove);
-        bot.strafeForDistance(-riggingDirection * farSeekStrafe);
-        if (bot.getDistance() < Constants.dsPropDistanceThreshold) {
-            propPosition = PropPosition.FAR;
-            bot.strafeForDistance(Constants.sensorToDrivetrainMiddle);
-            pushPixel(farPushMove);
-            bot.strafeForDistance(-(riggingDirection * (escapeStrafe - farSeekStrafe + riggingDirection * Constants.sensorToDrivetrainMiddle)));
-        }
-
-        // Scan for MIDDLE position
-        if (propPosition == null) {
-            bot.strafeForDistance(riggingDirection * farSeekStrafe);
-            bot.moveStraightForDistance(middleSeekMove);
-            bot.strafeForDistance(-Constants.sensorToDrivetrainMiddle);
-            propDistance = bot.getDistance();
-            bot.strafeForDistance(Constants.sensorToDrivetrainMiddle);
-            if (propDistance < Constants.dsPropDistanceThreshold) {
-                propPosition = PropPosition.MIDDLE;
-                pushPixel(middlePushMove);
-                bot.moveStraightForDistance(-middleSeekMove);
-                bot.strafeForDistance(-(riggingDirection * escapeStrafe));
-            }
-        }
-        setToLowCruisingPosition();
-        if (propPosition == null) {
-            // If object not yet found, assumed NEAR position
-            propPosition = PropPosition.NEAR;
-            bot.turnToHeading(-farHeading);
-            bot.strafeForDistance(-riggingDirection * Constants.sensorToDrivetrainMiddle);
-            pushPixel(nearPushMove);
-            bot.strafeForDistance(riggingDirection * Constants.sensorToDrivetrainMiddle);
-            bot.turnToHeading(0);
-            bot.moveStraightForDistance(-middleSeekMove);
-            bot.strafeForDistance(-(riggingDirection * (escapeStrafe - 2)));
-        }
-        return (propPosition);
-    }
-
-    protected void pushPixel(double distance) {
-        bot.moveStraightForDistance(distance + Constants.dsPlacementDistanceOffset);
-        bot.moveStraightForDistance(-(distance + Constants.dsPlacementDistanceOffset));
+        bot.turnToHeading(heading);
+        bot.moveStraightForDistance(distance);
+        bot.moveStraightForDistance(-distance);
     }
 
     protected void roughTravelToBoard(int boardPosition, int riggingDirection) {
         bot.turnToHeading(riggingDirection * 90);
     }
 
-    protected int aprilTagNumber(PropPosition propPosition, int riggingDirection, int boardDirection) {
-        int aprilTagNumber;
-
-        if (riggingDirection == -1) {
-            aprilTagNumber = 1;
-            if (propPosition == PropPosition.MIDDLE) {
-                aprilTagNumber = 2;
-            } else if (propPosition == PropPosition.FAR) {
-                aprilTagNumber = 3;
-            }
-        } else {
-            aprilTagNumber = 1;
-            if (propPosition == PropPosition.MIDDLE) {
-                aprilTagNumber = 2;
-            } else if (propPosition == PropPosition.NEAR) {
-                aprilTagNumber = 3;
-            }
-        }
-
-        if (boardDirection == 1) {
-            aprilTagNumber = aprilTagNumber + 3;
-        }
-//        telemetry.addData("Tag #", aprilTagNumber);
-//        telemetry.update();
-//        sleep(2000);
-        return (aprilTagNumber);
-    }
 
     protected void roughAlignToAprilTag(int boardDirection,
                                         int targetAprilTagNumber, StartPosition startPosition) {
@@ -256,10 +193,7 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.strafeForDistance(strafeVector);
     }
 
-    protected void autoOrientToAprilTag(AprilTagProcessor aprilTagProcessor, int targetTagNumber, int boardDirection) {
-//        telemetry.addData("Target: ",targetTagNumber);
-//        telemetry.update();
-//        sleep(500);
+    protected void autoOrientToAprilTag(VisionSensor visionSensor, int targetTagNumber, int boardDirection) {
 
         AprilTagDetection targetTag;
         boolean targetFound = false;
@@ -291,7 +225,7 @@ public abstract class AutoMaster extends LinearOpMode {
 //            sleep(500);
 
             // Search through detected tags to find the target tag
-            List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
+            List<AprilTagDetection> currentDetections = visionSensor.getAprilTagDetections();
             for (AprilTagDetection detection : currentDetections) {
 //                telemetry.addData("Iter Detections: ", targetFound);
 //                telemetry.update();
@@ -359,7 +293,8 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.liftStopAtPosition(Constants.liftAutoBoardPosition);
         bot.wristUp();
 //        sleep(500);
-        bot.creepStraightForDistance(bot.getDistance() - Constants.boardOffsetDistance);
+        bot.creepUntilContact();
+        bot.creepStraightForDistance(-Constants.boardOffsetDistance);
         bot.grabberOpen();
         sleep(250);
         bot.liftStopAtPosition(Constants.liftAutoBoardPosition + 150);
@@ -395,56 +330,5 @@ public abstract class AutoMaster extends LinearOpMode {
         sleep(2500);
     }
 
-    protected AprilTagProcessor createAprilTagProcessor() {
-        // Create the AprilTag processor by using a builder.
-        AprilTagProcessor aprilTagProcessor = new AprilTagProcessor.Builder().build();
 
-        // Adjust Image Decimation to trade-off detection-range for detection-rate.
-        // eg: Some typical detection data using a Logitech C920 WebCam
-        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
-        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
-        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
-        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
-        // Note: Decimation can be changed on-the-fly to adapt during a match.
-        aprilTagProcessor.setDecimation(2);
-
-        return (aprilTagProcessor);
-    }
-
-    //   Manually set the camera gain and exposure.
-    //   This can only be called AFTER calling initAprilTag(), and only works for Webcams;
-    protected VisionPortal createVisionPortal(int exposureMS, int gain, AprilTagProcessor
-            aprilTagProcessor) {
-        VisionPortal visionPortal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                .addProcessor(aprilTagProcessor)
-                .build();
-
-        // Make sure camera is streaming before we try to set the exposure controls
-        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            telemetry.addData("Camera", "Waiting");
-            telemetry.update();
-            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
-                sleep(20);
-            }
-            telemetry.addData("Camera", "Ready");
-            telemetry.update();
-        }
-
-        // Set camera controls unless we are stopping.
-        if (!isStopRequested()) {
-            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
-            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
-                exposureControl.setMode(ExposureControl.Mode.Manual);
-                sleep(50);
-            }
-            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
-            sleep(20);
-            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
-            gainControl.setGain(gain);
-            sleep(20);
-        }
-
-        return (visionPortal);
-    }
 }

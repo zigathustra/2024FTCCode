@@ -54,14 +54,13 @@ public class Constants {
     public static final double launcherUnlockedPosition = 0;
 
     // Prop Detection Settings
-    public static final double dsDistanceToCenterOfSpikeMarks = 25.0;
-    public static final double dsPropDistanceThreshold = 14;
-    public static final double dsPlacementDistanceOffset = 3.5;
-    public static final double dsFarPositionStrafeDistance = 8;
-    public static final double dsMiddlePositionStrafeDistance = 4.5;
-    public static final double dsNearPositionStrafeDistance = 12;
-    public static final int dsExposureMS = 6;
-    public static final int dsExposureGain = 250;
+    public static final double pdDistanceToEscapePosition = 25.5;
+    public static final double pdLeftPlacementDistance = 25.0;
+    public static final double pdCenterPlacementDistance = 25.0;
+    public static final double pdRightPlacementDistance = 25.0;
+    public static final double pdLeftHeading = 45;
+    public static final double pdCenterHeading = 0;
+    public static final double pdRightHeading = -45;
 
 
     // April Tag Detection Settings
