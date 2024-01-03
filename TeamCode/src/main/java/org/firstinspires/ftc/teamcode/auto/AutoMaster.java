@@ -18,7 +18,6 @@ public abstract class AutoMaster extends LinearOpMode {
     protected StartPosition startPosition;
     protected ParkPosition parkPosition;
     protected Bot bot;
-
     protected VisionSensor visionSensor;
 
     protected AutoMaster(Alliance alliance, StartPosition startPosition, ParkPosition parkPosition) {
@@ -32,8 +31,8 @@ public abstract class AutoMaster extends LinearOpMode {
         int riggingDirection;
         int boardDirection;
         int parkDirection;
-        PropDirection propDirection = PropDirection.CENTER;
         int targetAprilTagNumber;
+        PropDirection propDirection = null;
         ElapsedTime runTimer = new ElapsedTime();
 
         bot = new Bot(this, Constants.maxAutoSpeed);
@@ -50,9 +49,8 @@ public abstract class AutoMaster extends LinearOpMode {
 
         bot.wristDown();
         bot.grabberClose();
-        sleep(1000);
-
-        while ((!isStarted() && (!isStopRequested()))) {
+        sleep(500);
+        while (!isStarted() && !isStopRequested()) {
             propDirection = visionSensor.getPropDirection();
 
             telemetry.addData("Prop Position: ", propDirection);
@@ -70,13 +68,13 @@ public abstract class AutoMaster extends LinearOpMode {
 
         // Place pixel on correct spike mark and return to escape position
         // Use propDirection determined using webcam during init
-        placePropPixel(propDirection);
+        placePropPixel(propDirection, riggingDirection);
 
         roughTravelToBoard(boardDirection, riggingDirection);
 
         visionSensor.goToAprilTagDetectionMode();
 
-        targetAprilTagNumber = visionSensor.getTargetAprilTagNumber(alliance);
+        targetAprilTagNumber = getTargetAprilTagNumber(alliance, propDirection);
 
         roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
 
@@ -150,29 +148,55 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.liftStopAtPosition(Constants.liftAutoLowCruisingPosition);
     }
 
-
-    protected void placePropPixel(PropDirection propDirection) {
+    protected void placePropPixel(PropDirection propDirection, int riggingDirection) {
         double distance = Constants.pdCenterPlacementDistance;
         double heading = Constants.pdCenterHeading;
 
         if (propDirection == PropDirection.LEFT) {
             distance = Constants.pdLeftPlacementDistance;
             heading = Constants.pdLeftHeading;
-        } else if (propDirection == PropDirection.CENTER) {
+        } else if (propDirection == PropDirection.RIGHT) {
             distance = Constants.pdRightPlacementDistance;
             heading = Constants.pdRightHeading;
         }
 
+//        telemetry.addData("propDirection: ", propDirection);
+//        telemetry.addData("Heading: ", heading);
+//        telemetry.addData("Distance: ", distance);
+//        telemetry.update();
+//        sleep(5000);
+
         bot.turnToHeading(heading);
         bot.moveStraightForDistance(distance);
         bot.moveStraightForDistance(-distance);
+        bot.turnToHeading(0);
+        bot.strafeForDistance(-(riggingDirection * Constants.pdEscapeStrafeDistance));
     }
 
     protected void roughTravelToBoard(int boardPosition, int riggingDirection) {
         bot.turnToHeading(riggingDirection * 90);
     }
 
+    public int getTargetAprilTagNumber(Alliance alliance, PropDirection propDirection) {
+        int aprilTagNumber = 5;
 
+        if (alliance == Alliance.RED) {
+            aprilTagNumber = 4;
+            if (propDirection == PropDirection.CENTER) {
+                aprilTagNumber = 5;
+            } else if (propDirection == PropDirection.RIGHT) {
+                aprilTagNumber = 6;
+            }
+        } else {
+            aprilTagNumber = 1;
+            if (propDirection == PropDirection.CENTER) {
+                aprilTagNumber = 2;
+            } else if (propDirection == PropDirection.RIGHT) {
+                aprilTagNumber = 3;
+            }
+        }
+        return (aprilTagNumber);
+    }
     protected void roughAlignToAprilTag(int boardDirection,
                                         int targetAprilTagNumber, StartPosition startPosition) {
         double strafeVector = 0;

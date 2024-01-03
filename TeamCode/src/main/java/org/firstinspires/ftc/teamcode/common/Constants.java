@@ -11,7 +11,6 @@ public class Constants {
     public static final double driveTrainMaxVelocity = GoBilda312DcMotorData.maxCountsPerSec;
     public static final double mecanumMoveFactor = .95;
     public static final double mecanumMoveCountsPerInch = mecanumMoveFactor * GoBilda312DcMotorData.wheelCountsPerInch;
-
     public static final double mecanumStrafeFactor = 1.075;
     public static final double mecanumStrafeCountsPerInch = mecanumStrafeFactor * GoBilda312DcMotorData.wheelCountsPerInch;
     public static final DcMotor.Direction drivetrainLeftFrontDirection = DcMotor.Direction.REVERSE;
@@ -20,10 +19,10 @@ public class Constants {
     public static final DcMotor.Direction drivetrainRightRearDirection = DcMotor.Direction.FORWARD;
     public static final double maxNormalSpeed = 0.8;
     public static final double maxCreepSpeed = 0.15;
-    public static final double maxAutoSpeed = 0.7;
+    public static final double maxAutoSpeed = 0.4;
     public static final double autoTurnGain = 0.02;   // Larger is more responsive, but also less stable
     public static final double autoDriveGain = 0.03;
-    public static final double maxAutoStrafeSpeed = 0.7;
+    public static final double maxAutoStrafeSpeed = 0.4;
     public static final double maxAutoCorrectionDriveSpeed = 0.5; // Max driving speed for better distance accuracy
     public static final double maxAutoCorrectionTurnSpeed = 0.5; // Max Turn speed to limit turn rate
     public static final double autoHeadingThreshold = 0.5; // How close the heading must be to the target
@@ -54,13 +53,14 @@ public class Constants {
     public static final double launcherUnlockedPosition = 0;
 
     // Prop Detection Settings
-    public static final double pdDistanceToEscapePosition = 25.5;
-    public static final double pdLeftPlacementDistance = 25.0;
-    public static final double pdCenterPlacementDistance = 25.0;
-    public static final double pdRightPlacementDistance = 25.0;
-    public static final double pdLeftHeading = 45;
+    public static final double pdDistanceToEscapePosition = 14;
+    public static final double pdLeftPlacementDistance = 12.0;
+    public static final double pdLeftHeading = 35;
+    public static final double pdCenterPlacementDistance = 18.0;
     public static final double pdCenterHeading = 0;
-    public static final double pdRightHeading = -45;
+    public static final double pdRightPlacementDistance = 12.0;
+    public static final double pdRightHeading = -35;
+    public static final double pdEscapeStrafeDistance = 23;
 
 
     // April Tag Detection Settings

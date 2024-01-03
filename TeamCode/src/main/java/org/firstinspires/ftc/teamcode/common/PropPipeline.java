@@ -26,7 +26,7 @@ public class PropPipeline implements VisionProcessor {
     static final Scalar GREEN = new Scalar(0, 255, 0);
     static Scalar targetColor = RED;
     private volatile PropDirection direction = PropDirection.CENTER;
-    static final Point LEFT_REGION_TOP_LEFT_POINT = new Point(110, 205);
+    static final Point LEFT_REGION_TOP_LEFT_POINT = new Point(160, 205);
     static final Point CENTER_REGION_TOP_LEFT_POINT = new Point(405, 185);
     static final Point RIGHT_REGION_TOP_LEFT_POINT = new Point(600, 205);
     static final int LEFT_REGION_WIDTH = 20;
@@ -95,7 +95,6 @@ public class PropPipeline implements VisionProcessor {
         } else {
             if (leftDistance < centerDistance) {
                 direction = PropDirection.LEFT;
-                Imgproc.rectangle(input, leftRegionPointA, leftRegionPointB, BLUE, 2);
                 leftRegion.setTo(GREEN);
 
             } else {

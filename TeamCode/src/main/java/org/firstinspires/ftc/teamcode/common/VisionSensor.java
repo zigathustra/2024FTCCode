@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.common;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -17,11 +15,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class VisionSensor {
-    LinearOpMode opMode;
-    PropPipeline propProcessor;
-    AprilTagProcessor aprilTagProcessor;
-    VisionPortal visionPortal;
-    PropDirection propDirection = PropDirection.CENTER;
+    private LinearOpMode opMode;
+    private PropPipeline propProcessor;
+    private AprilTagProcessor aprilTagProcessor;
+    private VisionPortal visionPortal;
 
     int targetAprilTagNumber = 5;
 
@@ -40,6 +37,7 @@ public class VisionSensor {
         aprilTagProcessor.setDecimation(2);
 
         visionPortal = createVisionPortal(propProcessor, aprilTagProcessor);
+
         visionPortal.resumeLiveView();
     }
 
@@ -62,38 +60,18 @@ public class VisionSensor {
         pauseLiveView();
     }
 
-    public PropDirection getPropDirection() {
-        return (propDirection);
+    public PropDirection getPropDirection()
+    {
+        return (propProcessor.getPropDirection());
     }
 
     public List<AprilTagDetection> getAprilTagDetections() {
         return (aprilTagProcessor.getDetections());
     }
 
-    public int getTargetAprilTagNumber(Alliance alliance) {
-        int aprilTagNumber = 5;
-
-        if (alliance == Alliance.RED) {
-            aprilTagNumber = 4;
-            if (propDirection == PropDirection.CENTER) {
-                aprilTagNumber = 5;
-            } else if (propDirection == PropDirection.RIGHT) {
-                aprilTagNumber = 6;
-            }
-        } else {
-            aprilTagNumber = 1;
-            if (propDirection == PropDirection.CENTER) {
-                aprilTagNumber = 2;
-            } else if (propDirection == PropDirection.RIGHT) {
-                aprilTagNumber = 3;
-            }
-        }
-        return (aprilTagNumber);
-    }
-
-    private VisionPortal createVisionPortal(PropPipeline propPipeline, AprilTagProcessor aprilTagProcessor) {
+    protected VisionPortal createVisionPortal(PropPipeline propProcessor, AprilTagProcessor aprilTagProcessor) {
         VisionPortal visionPortal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCamera(opMode.hardwareMap.get(WebcamName.class, "Webcam 1"))
                 .addProcessor(propProcessor)
                 .addProcessor(aprilTagProcessor)
                 .enableLiveView(true)
@@ -138,6 +116,8 @@ public class VisionSensor {
     private void resumeLiveView() {
         visionPortal.resumeLiveView();
     }
+
+    public PropPipeline getPropProcessor(){return(propProcessor);}
 
     private void setAprilTagCameraValues() {
         // Set camera controls unless we are stopping.
