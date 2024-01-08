@@ -26,9 +26,9 @@ public class PropPipeline implements VisionProcessor {
     static final Scalar GREEN = new Scalar(0, 255, 0);
     static Scalar targetColor = RED;
     private volatile PropDirection direction = PropDirection.CENTER;
-    static final Point LEFT_REGION_TOP_LEFT_POINT = new Point(160, 205);
-    static final Point CENTER_REGION_TOP_LEFT_POINT = new Point(405, 185);
-    static final Point RIGHT_REGION_TOP_LEFT_POINT = new Point(600, 205);
+    static final Point LEFT_REGION_TOP_LEFT_POINT = new Point(115, 255);
+    static final Point CENTER_REGION_TOP_LEFT_POINT = new Point(440, 250);
+    static final Point RIGHT_REGION_TOP_LEFT_POINT = new Point(600, 255);
     static final int LEFT_REGION_WIDTH = 20;
     static final int LEFT_REGION_HEIGHT = 20;
     static final int CENTER_REGION_WIDTH = 20;
@@ -82,10 +82,6 @@ public class PropPipeline implements VisionProcessor {
         leftColor = Core.mean(leftRegion);
         centerColor = Core.mean(centerRegion);
 
-        //Putting averaged colors on zones (we can see on camera now)
-//        leftRegion.setTo(leftColor);
-//        centerRegion.setTo(centerColor);
-
         leftDistance = color_distance(leftColor, targetColor);
         centerDistance = color_distance(centerColor, targetColor);
 
@@ -123,7 +119,8 @@ public class PropPipeline implements VisionProcessor {
 
     }
 
-    public PropDirection getPropDirection() {
+    public PropDirection getPropDirection()
+    {
         return this.direction;
     }
 

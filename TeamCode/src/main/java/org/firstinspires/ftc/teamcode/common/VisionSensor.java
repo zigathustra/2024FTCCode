@@ -20,8 +20,6 @@ public class VisionSensor {
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal visionPortal;
 
-    int targetAprilTagNumber = 5;
-
     public VisionSensor(LinearOpMode opMode, Alliance alliance) {
         this.opMode = opMode;
         propProcessor = new PropPipeline();
@@ -66,7 +64,7 @@ public class VisionSensor {
     }
 
     public List<AprilTagDetection> getAprilTagDetections() {
-        return (aprilTagProcessor.getDetections());
+        return(aprilTagProcessor.getDetections());
     }
 
     protected VisionPortal createVisionPortal(PropPipeline propProcessor, AprilTagProcessor aprilTagProcessor) {
@@ -116,8 +114,6 @@ public class VisionSensor {
     private void resumeLiveView() {
         visionPortal.resumeLiveView();
     }
-
-    public PropPipeline getPropProcessor(){return(propProcessor);}
 
     private void setAprilTagCameraValues() {
         // Set camera controls unless we are stopping.

@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.firstinspires.ftc.teamcode.common.*;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 public abstract class AutoMaster extends LinearOpMode {
     protected Alliance alliance;
@@ -32,6 +33,8 @@ public abstract class AutoMaster extends LinearOpMode {
         int boardDirection;
         int parkDirection;
         int targetAprilTagNumber;
+        PropPipeline propProcessor = null;
+        AprilTagProcessor aprilTagProcessor;
         PropDirection propDirection = null;
         ElapsedTime runTimer = new ElapsedTime();
 
@@ -50,6 +53,7 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.wristDown();
         bot.grabberClose();
         sleep(500);
+
         while (!isStarted() && !isStopRequested()) {
             propDirection = visionSensor.getPropDirection();
 
