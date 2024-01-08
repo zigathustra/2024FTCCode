@@ -50,7 +50,7 @@ public abstract class AutoMaster extends LinearOpMode {
 
         visionSensor.goToPropDetectionMode();
 
-        bot.wristDown();
+        bot.wristMiddle();
         bot.grabberClose();
         sleep(500);
 
@@ -318,14 +318,16 @@ public abstract class AutoMaster extends LinearOpMode {
     protected void placePixelOnBoard() {
         bot.moveStraightForDistance(Constants.boardApproachDistance);
         bot.strafeForDistance(-Constants.sensorToDrivetrainMiddle);
-        bot.liftStopAtPosition(Constants.liftAutoBoardPosition);
-        bot.wristUp();
-//        sleep(500);
+        bot.liftStopAtPosition(Constants.liftAutoBoardProbePosition);
+        bot.wristDown();
         bot.creepUntilContact();
         bot.creepStraightForDistance(-Constants.boardOffsetDistance);
-        bot.grabberOpen();
+        bot.wristUp();
+//        bot.wristToPosition(Constants.wristUpPosition);
+        bot.liftStopAtPosition(Constants.liftAutoBoardPlacementPosition);
         sleep(250);
-        bot.liftStopAtPosition(Constants.liftAutoBoardPosition + 150);
+        bot.creepStraightForDistance(Constants.boardOffsetDistance + 4.5);
+        bot.grabberOpen();
         sleep(250);
         bot.moveStraightForDistance(-Constants.boardEscapeDistance);
     }
@@ -352,7 +354,7 @@ public abstract class AutoMaster extends LinearOpMode {
     protected void setToTeleopStartingPosition() {
         bot.grabberClose();
         bot.liftStopAtPosition(Constants.liftAutoHighCruisingPosition);
-        bot.wristDown();
+        bot.wristMiddle();
         sleep(250);
         bot.liftStopAtPosition(0);
         sleep(2500);

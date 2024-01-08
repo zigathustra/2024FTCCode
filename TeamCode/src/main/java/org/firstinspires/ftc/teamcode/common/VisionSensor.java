@@ -22,7 +22,7 @@ public class VisionSensor {
 
     public VisionSensor(LinearOpMode opMode, Alliance alliance) {
         this.opMode = opMode;
-        propProcessor = new PropPipeline();
+        propProcessor = new PropPipeline(this.opMode);
         propProcessor.setAlliance(alliance);
         aprilTagProcessor = new AprilTagProcessor.Builder().build();
         // Adjust Image Decimation to trade-off detection-range for detection-rate.

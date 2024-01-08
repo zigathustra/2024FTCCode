@@ -35,14 +35,15 @@ public class Constants {
     public static final int liftMaxTolerance = 25;
     public static final int liftMinPosition = 0;
     public static final int liftMinTolerance = 25;
-    public static final int liftAutoBoardPosition = 950;
+    public static final int liftAutoBoardProbePosition = 1750;
+    public static final int liftAutoBoardPlacementPosition = 1100;
     public static final int liftAutoHighCruisingPosition = 550;
     public static final int liftAutoLowCruisingPosition = 100;
 
     // Wrist settings
-    public static final double wristDownPosition = 0.4;
-    public static final double wristMiddlePosition = 0.5;
-    public static final double wristUpPosition = 0.95;
+    public static final double wristDownPosition = 0.85;
+    public static final double wristMiddlePosition = 0.73;
+    public static final double wristUpPosition = 0.4;
 
     // Grabber settings
     public static final double grabberClosedPosition = 0.45;
@@ -75,8 +76,8 @@ public class Constants {
 
     // Pixel placement settings
     public static final double boardApproachDistance = 4;
-    public static final double boardOffsetDistance = 6;
-    public static final double boardEscapeDistance = 10;
+    public static final double boardOffsetDistance = 2;
+    public static final double boardEscapeDistance = 8;
 
     // Parking Settings
     public static final double distanceBetweenAprilTags = 6;

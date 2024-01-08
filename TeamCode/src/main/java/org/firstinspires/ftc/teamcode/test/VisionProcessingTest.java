@@ -56,7 +56,7 @@ public class VisionProcessingTest extends LinearOpMode {
     }
 
     protected PropPipeline createPropProcessor() {
-        PropPipeline propProcessor = new PropPipeline();
+        PropPipeline propProcessor = new PropPipeline(this);
         return (propProcessor);
     }
 

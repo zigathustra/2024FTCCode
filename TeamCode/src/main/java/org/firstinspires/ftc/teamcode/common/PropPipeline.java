@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.common;
 
 import android.graphics.Canvas;
 
-import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.teamcode.common.Alliance;
@@ -15,7 +15,7 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-@Config
+
 public class PropPipeline implements VisionProcessor {
     private Alliance alliance;
     Scalar leftColor, centerColor;
@@ -35,7 +35,12 @@ public class PropPipeline implements VisionProcessor {
     static final int CENTER_REGION_HEIGHT = 20;
     static final int RIGHT_REGION_WIDTH = 20;
     static final int RIGHT_REGION_HEIGHT = 20;
+    LinearOpMode opMode = null;
 
+    public PropPipeline(LinearOpMode opMode)
+    {
+        this.opMode = opMode;
+    }
     static final Point leftRegionPointA = new Point(
             LEFT_REGION_TOP_LEFT_POINT.x,
             LEFT_REGION_TOP_LEFT_POINT.y);
@@ -84,7 +89,10 @@ public class PropPipeline implements VisionProcessor {
 
         leftDistance = color_distance(leftColor, targetColor);
         centerDistance = color_distance(centerColor, targetColor);
-
+        opMode.telemetry.addData("leftColor: ", leftColor);
+        opMode.telemetry.addData("centerColor: ", centerColor);
+        opMode.telemetry.addData("leftDistance: ", leftDistance);
+        opMode.telemetry.addData("centerDistance: ", centerDistance);
         if ((leftDistance > 195) && (centerDistance > 190)) {
             direction = PropDirection.RIGHT;
             rightRegion.setTo(GREEN);

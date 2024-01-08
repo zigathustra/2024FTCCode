@@ -17,7 +17,6 @@ public class Bot {
     protected Servo grabber = null;
     protected Servo launcher = null;
     protected Rev2mDistanceSensor distanceSensor = null;
-
     protected TouchSensor touchSensor = null;
     protected LinearOpMode opMode = null;
     protected double maxSpeed = Constants.maxNormalSpeed; // Default speed. Reassigned in the constructor.
@@ -147,7 +146,9 @@ public class Bot {
     public void wristDown() {
         wrist.setPosition(Constants.wristDownPosition);
     }
-
+    public void wristToPosition(double position) {
+        wrist.setPosition(position);
+    }
     public void grabberOpen() {
         grabber.setPosition(Constants.grabberOpenPosition);
     }
