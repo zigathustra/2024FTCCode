@@ -55,12 +55,12 @@ public class Constants {
 
     // Prop Detection Settings
     public static final double pdDistanceToEscapePosition = 14;
-    public static final double pdLeftPlacementDistance = 12.0;
-    public static final double pdLeftHeading = 35;
-    public static final double pdCenterPlacementDistance = 18.0;
+    public static final double pdLeftPlacementDistance = 10.5;
+    public static final double pdLeftHeading = 90;
+    public static final double pdCenterPlacementDistance = 24.0;
     public static final double pdCenterHeading = 0;
-    public static final double pdRightPlacementDistance = 12.0;
-    public static final double pdRightHeading = -35;
+    public static final double pdRightPlacementDistance = 10.5;
+    public static final double pdRightHeading = -90;
     public static final double pdEscapeStrafeDistance = 23;
 
 
@@ -77,7 +77,7 @@ public class Constants {
     // Pixel placement settings
     public static final double boardApproachDistance = 4;
     public static final double boardOffsetDistance = 2;
-    public static final double boardEscapeDistance = 8;
+    public static final double boardEscapeDistance = 10;
 
     // Parking Settings
     public static final double distanceBetweenAprilTags = 6;

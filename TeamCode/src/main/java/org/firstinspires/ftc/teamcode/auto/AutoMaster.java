@@ -60,7 +60,6 @@ public abstract class AutoMaster extends LinearOpMode {
             telemetry.addData("Prop Position: ", propDirection);
             telemetry.update();
 
-            // Don't burn CPU cycles busy-looping in this sample
             sleep(50);
         }
         runTimer.reset();
@@ -82,18 +81,18 @@ public abstract class AutoMaster extends LinearOpMode {
 
         roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
 
-        if (runTimer.time() <= orientMaxTime()) {
+//        if (runTimer.time() <= orientMaxTime()) {
             // Correct strafe to directly face the target April Tag
             autoOrientToAprilTag(visionSensor, targetAprilTagNumber, boardDirection);
-        }
+//        }
 
-        if (runTimer.time() <= placeMaxTime()) {            // Correct strafe to directly face the target April Tag
+//        if (runTimer.time() <= placeMaxTime()) {            // Correct strafe to directly face the target April Tag
             placePixelOnBoard();
-        }
+//        }
 
-        if (runTimer.time() <= parkMaxTime()) {
+//        if (runTimer.time() <= parkMaxTime()) {
             park(boardDirection, targetAprilTagNumber, parkDirection);
-        }
+//        }
 //        telemetry.addData("finish park Time: ",runTimer.time());
 //        telemetry.update();
 //        sleep(1000);
@@ -153,15 +152,18 @@ public abstract class AutoMaster extends LinearOpMode {
     }
 
     protected void placePropPixel(PropDirection propDirection, int riggingDirection) {
-        double distance = Constants.pdCenterPlacementDistance;
+        double setupDistance = 0;
+        double placementDistance = Constants.pdCenterPlacementDistance;
         double heading = Constants.pdCenterHeading;
 
         if (propDirection == PropDirection.LEFT) {
-            distance = Constants.pdLeftPlacementDistance;
+            placementDistance = Constants.pdLeftPlacementDistance;
             heading = Constants.pdLeftHeading;
+            setupDistance = 15;
         } else if (propDirection == PropDirection.RIGHT) {
-            distance = Constants.pdRightPlacementDistance;
+            placementDistance = Constants.pdRightPlacementDistance;
             heading = Constants.pdRightHeading;
+            setupDistance = 15;
         }
 
 //        telemetry.addData("propDirection: ", propDirection);
@@ -170,10 +172,12 @@ public abstract class AutoMaster extends LinearOpMode {
 //        telemetry.update();
 //        sleep(5000);
 
+        bot.moveStraightForDistance(setupDistance);
         bot.turnToHeading(heading);
-        bot.moveStraightForDistance(distance);
-        bot.moveStraightForDistance(-distance);
+        bot.moveStraightForDistance(placementDistance);
+        bot.moveStraightForDistance(-placementDistance);
         bot.turnToHeading(0);
+        bot.moveStraightForDistance(-setupDistance);
         bot.strafeForDistance(-(riggingDirection * Constants.pdEscapeStrafeDistance));
     }
 

@@ -26,7 +26,7 @@ public class FarBoard extends org.firstinspires.ftc.teamcode.java.auto.AutoMaste
     protected void roughTravelToBoard(int boardDirection, int rigginDirection)
     {
         bot.turnToHeading(0);
-        bot.moveStraightForDistance(35);
+        bot.moveStraightForDistance(39);
         bot.turnToHeading(boardDirection * -90);
         bot.moveStraightForDistance(98);
     }
