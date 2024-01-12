@@ -155,10 +155,12 @@ public abstract class AutoMaster extends LinearOpMode {
         double setupDistance = 0;
         double placementDistance = Constants.pdCenterPlacementDistance;
         double heading = Constants.pdCenterHeading;
+        double correctionDistance = 0;
 
         if (propDirection == PropDirection.LEFT) {
             placementDistance = Constants.pdLeftPlacementDistance;
             heading = Constants.pdLeftHeading;
+            correctionDistance = 4;
             setupDistance = 15;
         } else if (propDirection == PropDirection.RIGHT) {
             placementDistance = Constants.pdRightPlacementDistance;
@@ -175,8 +177,9 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.moveStraightForDistance(setupDistance);
         bot.turnToHeading(heading);
         bot.moveStraightForDistance(placementDistance);
-        bot.moveStraightForDistance(-placementDistance);
+        bot.moveStraightForDistance(-placementDistance-correctionDistance);
         bot.turnToHeading(0);
+        bot.strafeForDistance(-correctionDistance);
         bot.moveStraightForDistance(-setupDistance);
         bot.strafeForDistance(-(riggingDirection * Constants.pdEscapeStrafeDistance));
     }
@@ -240,7 +243,7 @@ public abstract class AutoMaster extends LinearOpMode {
         double maxScanHeading = startHeading + 15;
         double minScanHeading = startHeading - 15;
         ElapsedTime scanTimer = new ElapsedTime();
-        double scanDuration = 4;
+        double scanDuration = 5.5;
         double yawSearchPower = .15;
         double scanDirection = 1;
 
