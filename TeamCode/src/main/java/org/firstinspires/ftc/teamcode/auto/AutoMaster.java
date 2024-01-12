@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.java.auto;
+package org.firstinspires.ftc.teamcode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.Range;

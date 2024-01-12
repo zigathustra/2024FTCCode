@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.common.PropPipeline;
 import org.firstinspires.ftc.teamcode.common.StartPosition;
 
 import org.firstinspires.ftc.teamcode.common.VisionSensor;
-import org.firstinspires.ftc.teamcode.java.auto.AutoMaster;
+import org.firstinspires.ftc.teamcode.auto.AutoMaster;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 

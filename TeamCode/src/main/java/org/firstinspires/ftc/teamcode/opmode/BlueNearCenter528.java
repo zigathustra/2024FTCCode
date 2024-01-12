@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.common.Alliance;
 import org.firstinspires.ftc.teamcode.common.ParkPosition;
 import org.firstinspires.ftc.teamcode.common.StartPosition;
-import org.firstinspires.ftc.teamcode.java.auto.AutoMaster;
+import org.firstinspires.ftc.teamcode.auto.AutoMaster;
 
 @Autonomous(name = "BlueNearCenter528", group = "BlueNear")
 public class BlueNearCenter528 extends AutoMaster {

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.java.auto;
+package org.firstinspires.ftc.teamcode.auto;
 
 import org.firstinspires.ftc.teamcode.common.Alliance;
 import org.firstinspires.ftc.teamcode.common.ParkPosition;
@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.common.VisionSensor;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-public class FarNoBoard extends org.firstinspires.ftc.teamcode.java.auto.AutoMaster {
+public class FarNoBoard extends org.firstinspires.ftc.teamcode.auto.AutoMaster {
     public FarNoBoard(Alliance alliance)
     {
         super(alliance, StartPosition.FAR, ParkPosition.NONE);

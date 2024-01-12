@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.common.Alliance;
 import org.firstinspires.ftc.teamcode.common.ParkPosition;
 import org.firstinspires.ftc.teamcode.common.StartPosition;
 
-import org.firstinspires.ftc.teamcode.java.auto.AutoMaster;
+import org.firstinspires.ftc.teamcode.auto.AutoMaster;
 
 
 @Autonomous(name = "RedNearCorner528", group = "RedNear")

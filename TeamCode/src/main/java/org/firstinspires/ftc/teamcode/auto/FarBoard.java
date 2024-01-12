@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.java.auto;
+package org.firstinspires.ftc.teamcode.auto;
 
 import org.firstinspires.ftc.teamcode.common.Alliance;
 import org.firstinspires.ftc.teamcode.common.ParkPosition;
 import org.firstinspires.ftc.teamcode.common.StartPosition;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-public class FarBoard extends org.firstinspires.ftc.teamcode.java.auto.AutoMaster {
+public class FarBoard extends org.firstinspires.ftc.teamcode.auto.AutoMaster {
 
     protected FarBoard(Alliance alliance)
     {
