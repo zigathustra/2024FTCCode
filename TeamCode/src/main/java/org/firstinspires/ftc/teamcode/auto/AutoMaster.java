@@ -71,16 +71,15 @@ public abstract class AutoMaster extends LinearOpMode {
 
         // Place pixel on correct spike mark and return to escape position
         // Use propDirection determined using webcam during init
-        placePropPixel(propDirection, riggingDirection);
+            placePropPixel(propDirection, riggingDirection);
 
-        roughTravelToBoard(boardDirection, riggingDirection);
+            roughTravelToBoard(boardDirection, riggingDirection);
 
         visionSensor.goToAprilTagDetectionMode();
 
         targetAprilTagNumber = getTargetAprilTagNumber(alliance, propDirection);
 
-        roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
-
+            roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
 //        if (runTimer.time() <= orientMaxTime()) {
             // Correct strafe to directly face the target April Tag
             autoOrientToAprilTag(visionSensor, targetAprilTagNumber, boardDirection);
@@ -91,13 +90,19 @@ public abstract class AutoMaster extends LinearOpMode {
 //        }
 
 //        if (runTimer.time() <= parkMaxTime()) {
+        if (opModeIsActive()) {
+
             park(boardDirection, targetAprilTagNumber, parkDirection);
+        }
 //        }
 //        telemetry.addData("finish park Time: ",runTimer.time());
 //        telemetry.update();
 //        sleep(1000);
         // Lower lift, lower wrist, open grabber
-        setToTeleopStartingPosition();
+            
+        if (opModeIsActive()) {
+            setToTeleopStartingPosition();
+        }
     }
 
     protected int determineRiggingDirection() {
