@@ -49,6 +49,16 @@ public class DriveTrain {
         imu.resetYaw();
     }
 
+    public void setToFastSpeed()
+    {
+        this.maxSpeed = Constants.maxNormalSpeed;
+    }
+
+    public void setToSlowedSpeed()
+    {
+        this.maxSpeed = Constants.maxSlowedSpeed;
+    }
+
     public void turnToHeading(double targetHeading) {
         double turnSpeed = Constants.maxAutoCorrectionTurnSpeed;
         double headingError = getHeadingError(targetHeading);
@@ -81,6 +91,7 @@ public class DriveTrain {
     public void creepDirectionNoEnc(double axial, double strafe, double yaw) {
         moveDirection(axial * Constants.maxCreepSpeed, strafe * Constants.maxCreepSpeed, yaw * Constants.maxCreepSpeed);
     }
+
     public void moveDirection(double axial, double strafe, double yaw) {
         // Calculate wheel powers.
         double leftFrontPower = axial - strafe - yaw;
@@ -133,14 +144,14 @@ public class DriveTrain {
         setRunUsingEncoder();
     }
 
-    public void moveStraightForDistance(double distance)
-    {
+    public void moveStraightForDistance(double distance) {
         moveStraightForDistance(distance, Constants.maxAutoCorrectionTurnSpeed, Constants.maxAutoCorrectionDriveSpeed);
     }
-    public void creepStraightForDistance(double distance)
-    {
+
+    public void creepStraightForDistance(double distance) {
         moveStraightForDistance(distance, Constants.maxCreepSpeed, Constants.maxCreepSpeed);
     }
+
     private void moveStraightForDistance(double distance, double turnSpeed, double driveSpeed) {
         int targetCounts = (int) (distance * moveCountsPerInch);
         int leftFrontTarget = 0;

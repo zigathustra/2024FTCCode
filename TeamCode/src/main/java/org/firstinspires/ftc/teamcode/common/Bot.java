@@ -69,7 +69,14 @@ public class Bot {
         return driveTrain.getHeading();
     };
 
-
+    public void setToFastSpeed()
+    {
+        driveTrain.setToFastSpeed();
+    }
+    public void setToSlowedSpeed()
+    {
+        driveTrain.setToSlowedSpeed();
+    }
     // Turn to a specified heading in degrees
     // 0 is straight ahead
     // > 0 is CCW
