@@ -42,7 +42,7 @@ public class Constants {
     public static final int liftAutoLowCruisingPosition = 100;
 
     // Wrist settings
-    public static final double wristDownPosition = 0.85;
+    public static final double wristDownPosition = 0.90;
     public static final double wristMiddlePosition = 0.73;
     public static final double wristUpPosition = 0.4;
 
