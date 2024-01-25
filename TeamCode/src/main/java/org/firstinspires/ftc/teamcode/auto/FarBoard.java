@@ -5,7 +5,7 @@ import org.firstinspires.ftc.teamcode.common.ParkPosition;
 import org.firstinspires.ftc.teamcode.common.StartPosition;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-public class FarBoard extends org.firstinspires.ftc.teamcode.auto.AutoMaster {
+public class FarBoard extends AutoMaster {
 
     protected FarBoard(Alliance alliance)
     {

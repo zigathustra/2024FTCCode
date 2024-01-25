@@ -38,7 +38,7 @@ public abstract class AutoMaster extends LinearOpMode {
         PropDirection propDirection = null;
         ElapsedTime runTimer = new ElapsedTime();
 
-        bot = new Bot(this, Constants.maxAutoSpeed);
+        bot = new Bot(this, getMaxSpeed());
 
         visionSensor = new VisionSensor(this, alliance);
 
@@ -62,22 +62,23 @@ public abstract class AutoMaster extends LinearOpMode {
 
             sleep(50);
         }
-        runTimer.reset();
-        visionSensor.goToNoSensingMode();
-        setToLowCruisingPosition();
+        if (!isStopRequested()) {
+            runTimer.reset();
+            visionSensor.goToNoSensingMode();
+            setToLowCruisingPosition();
 
-        // Move forward to escape position
-        bot.moveStraightForDistance(Constants.pdDistanceToEscapePosition);
+            // Move forward to escape position
+            bot.moveStraightForDistance(Constants.pdDistanceToEscapePosition);
 
-        // Place pixel on correct spike mark and return to escape position
-        // Use propDirection determined using webcam during init
+            // Place pixel on correct spike mark and return to escape position
+            // Use propDirection determined using webcam during init
             placePropPixel(propDirection, riggingDirection);
 
             roughTravelToBoard(boardDirection, riggingDirection);
 
-        visionSensor.goToAprilTagDetectionMode();
+            visionSensor.goToAprilTagDetectionMode();
 
-        targetAprilTagNumber = getTargetAprilTagNumber(alliance, propDirection);
+            targetAprilTagNumber = getTargetAprilTagNumber(alliance, propDirection);
 
             roughAlignToAprilTag(boardDirection, targetAprilTagNumber, startPosition);
 //        if (runTimer.time() <= orientMaxTime()) {
@@ -90,19 +91,20 @@ public abstract class AutoMaster extends LinearOpMode {
 //        }
 
 //        if (runTimer.time() <= parkMaxTime()) {
-        if (opModeIsActive()) {
-
             park(boardDirection, targetAprilTagNumber, parkDirection);
-        }
 //        }
 //        telemetry.addData("finish park Time: ",runTimer.time());
 //        telemetry.update();
 //        sleep(1000);
-        // Lower lift, lower wrist, open grabber
-            
-        if (opModeIsActive()) {
+            // Lower lift, lower wrist, open grabber
+
             setToTeleopStartingPosition();
         }
+    }
+
+
+    protected double getMaxSpeed() {
+        return (Constants.maxAutoSpeed);
     }
 
     protected int determineRiggingDirection() {
@@ -182,7 +184,7 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.moveStraightForDistance(setupDistance);
         bot.turnToHeading(heading);
         bot.moveStraightForDistance(placementDistance);
-        bot.moveStraightForDistance(-placementDistance-correctionDistance);
+        bot.moveStraightForDistance(-placementDistance - correctionDistance);
         bot.turnToHeading(0);
         bot.strafeForDistance(-correctionDistance);
         bot.moveStraightForDistance(-setupDistance);
@@ -213,6 +215,7 @@ public abstract class AutoMaster extends LinearOpMode {
         }
         return (aprilTagNumber);
     }
+
     protected void roughAlignToAprilTag(int boardDirection,
                                         int targetAprilTagNumber, StartPosition startPosition) {
         double strafeVector = 0;

@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.common.Alliance;
 import org.firstinspires.ftc.teamcode.auto.FarBoard;
 
 @Autonomous(name = "RedFarBoard528", group = "RedFar")
-public class RedFarBoard528 extends org.firstinspires.ftc.teamcode.auto.FarBoard {
+public class RedFarBoard528 extends FarBoard {
     public RedFarBoard528() {
         super(Alliance.RED);
     }

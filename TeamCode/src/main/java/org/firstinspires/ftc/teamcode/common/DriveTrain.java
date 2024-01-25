@@ -137,7 +137,7 @@ public class DriveTrain {
 
         setRunToPosition();
 
-        while (leftFrontDrive.isBusy() && leftRearDrive.isBusy() && rightFrontDrive.isBusy() && rightRearDrive.isBusy()) {
+        while (leftFrontDrive.isBusy() && leftRearDrive.isBusy() && rightFrontDrive.isBusy() && rightRearDrive.isBusy() && !opMode.isStopRequested()) {
             moveDirection(0, strafeSpeed, 0);
         }
         stop();
@@ -173,7 +173,7 @@ public class DriveTrain {
 
         setRunToPosition();
 
-        while (leftFrontDrive.isBusy() && leftRearDrive.isBusy() && rightFrontDrive.isBusy() && rightRearDrive.isBusy()) {
+        while (leftFrontDrive.isBusy() && leftRearDrive.isBusy() && rightFrontDrive.isBusy() && rightRearDrive.isBusy() && !opMode.isStopRequested()) {
             //while (leftFrontDrive.isBusy()) {
             headingError = getHeadingError(targetHeading);
             // Determine required steering to keep on heading
