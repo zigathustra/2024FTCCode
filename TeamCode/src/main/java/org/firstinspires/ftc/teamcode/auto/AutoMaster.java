@@ -230,7 +230,7 @@ public abstract class AutoMaster extends LinearOpMode {
             if (startPosition == StartPosition.FAR) {
                 strafeVector = chassisWidth + (targetAprilTagNumber - 4 + 2) * Constants.distanceBetweenAprilTags;
             } else {
-                strafeVector = -1 - (6 - targetAprilTagNumber) * Constants.distanceBetweenAprilTags;
+                strafeVector = -2 - (6 - targetAprilTagNumber) * Constants.distanceBetweenAprilTags;
             }
         }
         bot.strafeForDistance(strafeVector);
