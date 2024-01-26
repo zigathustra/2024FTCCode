@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.common.Alliance;
 
 import org.firstinspires.ftc.teamcode.auto.FarNoBoard;
 
-@Autonomous(name = "RedFarNoBoard528", group = "RedFar")
+@Autonomous(name = "\uD83D\uDD25RedFarNoBoard528", group = "RedFar")
 public class RedFarNoBoard528 extends FarNoBoard {
     public RedFarNoBoard528()
     {

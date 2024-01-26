@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.common.Alliance;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 
 @Autonomous(name = "BoardPlacementTest", group = "Test")
+@Disabled
 public class BoardPlacementTest extends AutoMaster {
     public BoardPlacementTest() {
         super(Alliance.RED, StartPosition.NEAR, ParkPosition.CORNER);
