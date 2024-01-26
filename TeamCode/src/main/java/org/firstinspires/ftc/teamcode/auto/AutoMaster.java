@@ -230,7 +230,7 @@ public abstract class AutoMaster extends LinearOpMode {
             if (startPosition == StartPosition.FAR) {
                 strafeVector = chassisWidth + (targetAprilTagNumber - 4 + 2) * Constants.distanceBetweenAprilTags;
             } else {
-                strafeVector = -(6 - targetAprilTagNumber) * Constants.distanceBetweenAprilTags;
+                strafeVector = -1 - (6 - targetAprilTagNumber) * Constants.distanceBetweenAprilTags;
             }
         }
         bot.strafeForDistance(strafeVector);
@@ -251,7 +251,7 @@ public abstract class AutoMaster extends LinearOpMode {
         double maxScanHeading = startHeading + 15;
         double minScanHeading = startHeading - 15;
         ElapsedTime scanTimer = new ElapsedTime();
-        double scanDuration = 5.5;
+        double scanDuration = 4;
         double yawSearchPower = .15;
         double scanDirection = 1;
 
@@ -358,7 +358,7 @@ public abstract class AutoMaster extends LinearOpMode {
         if (parkDirection > 0) {
             strafeVector = strafeVector + (4.5 - adjustedTagNumber) * Constants.distanceBetweenAprilTags;
         } else {
-            strafeVector = -strafeVector - adjustedTagNumber * Constants.distanceBetweenAprilTags;
+            strafeVector = -strafeVector - 3 - adjustedTagNumber * Constants.distanceBetweenAprilTags;
         }
 
         bot.turnToHeading(boardDirection * 90);
@@ -374,6 +374,4 @@ public abstract class AutoMaster extends LinearOpMode {
         bot.liftStopAtPosition(0);
         sleep(2500);
     }
-
-
 }

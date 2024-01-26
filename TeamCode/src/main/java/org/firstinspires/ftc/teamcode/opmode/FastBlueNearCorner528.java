@@ -6,10 +6,10 @@ import org.firstinspires.ftc.teamcode.auto.FastNear;
 import org.firstinspires.ftc.teamcode.common.Alliance;
 
 
-@Autonomous(name = "FastRedNearCorner528", group = "FastNear")
-public class FastRedNearCorner528 extends FastNear {
-    public FastRedNearCorner528() {
-        super(Alliance.RED);
+@Autonomous(name = "FastBlueNearCorner528", group = "FastNear")
+public class FastBlueNearCorner528 extends FastNear {
+    public FastBlueNearCorner528() {
+        super(Alliance.BLUE);
     }
 }
 
