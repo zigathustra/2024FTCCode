@@ -33,7 +33,7 @@ public class Constants {
     public static final double liftMaxVelocity = GoBilda312DcMotorData.maxCountsPerSec;
     public static final double liftMaxMoveSpeed = 1.0;
     public static final double liftStopPowerFactor = 1.0;
-    public static final int liftMaxPosition = 3000;
+    public static final int liftMaxPosition = 2250;
     public static final int liftMaxTolerance = 25;
     public static final int liftMinPosition = 0;
     public static final int liftMinTolerance = 25;
@@ -43,9 +43,9 @@ public class Constants {
     public static final int liftAutoLowCruisingPosition = 100;
 
     // Wrist settings
-    public static final double wristDownPosition = 0.90;
-    public static final double wristMiddlePosition = 0.73;
-    public static final double wristUpPosition = 0.4;
+    public static final double wristDownPosition = 0.9;
+    public static final double wristMiddlePosition = 0.8;
+    public static final double wristUpPosition = 0.5;
 
     // Grabber settings
     public static final double grabberClosedPosition = 0.45;
