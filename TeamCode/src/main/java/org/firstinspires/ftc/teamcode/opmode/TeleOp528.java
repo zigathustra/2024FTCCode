@@ -21,7 +21,7 @@ public class TeleOp528 extends LinearOpMode {
         bot.wristMiddle();
         waitForStart();
 
-        while (opModeIsActive()) {
+        while (opModeIsActive()&&!gamepad1.ps) {
 
 //            if (gamepad1.left_bumper) {
 //                bot.setToSlowedSpeed();
@@ -68,9 +68,17 @@ public class TeleOp528 extends LinearOpMode {
                 bot.wristMiddle();
             }
             if (gamepad1.share && gamepad1.start) {
+                bot.liftZero();
+            }
+            if(gamepad1.start){
                 bot.launcherUnlocked();
-            } else if (gamepad1.right_bumper && gamepad1.left_bumper) {
+            } else if(gamepad1.share) {
                 bot.launcherLocked();
+            }
+            if(gamepad1.right_bumper){
+                bot.pokeyUp();
+            }else if(gamepad1.left_bumper){
+                bot.pokeyDown();
             }
         }
     }

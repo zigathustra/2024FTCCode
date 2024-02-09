@@ -16,6 +16,7 @@ public class Bot {
     protected Servo wrist = null;
     protected Servo grabber = null;
     protected Servo launcher = null;
+    protected Servo pokey = null;
     protected Rev2mDistanceSensor distanceSensor = null;
     protected TouchSensor touchSensor = null;
     protected LinearOpMode opMode = null;
@@ -52,6 +53,9 @@ public class Bot {
 
         launcher = opMode.hardwareMap.get(Servo.class, "launcher");
         launcher.setPosition(Constants.launcherLockedPosition);
+
+        pokey = opMode.hardwareMap.get(Servo.class, "pokey");
+        pokey.setPosition(Constants.pokeyDownPosition);
 //        opMode.telemetry.addData("d_sensor ", 1);
 //        opMode.telemetry.update();
 //        opMode.sleep (1000);
@@ -134,13 +138,14 @@ public class Bot {
         lift.liftDown(speed);
     }
 
-    public void liftStop() {
-        lift.stop();
+    public void liftStop() {lift.stop();
     }
 
     public void liftStopAtPosition(int position) {
         lift.stopAtPosition(position);
     }
+
+    public void liftZero(){lift.liftZero();}
 
     public void wristUp() {
         wrist.setPosition(Constants.wristUpPosition);
@@ -149,7 +154,6 @@ public class Bot {
     public void wristMiddle() {
         wrist.setPosition(Constants.wristMiddlePosition);
     }
-
     public void wristDown() {
         wrist.setPosition(Constants.wristDownPosition);
     }
@@ -167,6 +171,8 @@ public class Bot {
     public void launcherLocked(){ launcher.setPosition(Constants.launcherLockedPosition);}
 
     public void launcherUnlocked(){ launcher.setPosition(Constants.launcherUnlockedPosition);}
+    public void pokeyDown(){ pokey.setPosition(Constants.pokeyDownPosition);}
+    public void pokeyUp(){ pokey.setPosition(Constants.pokeyUpPosition);}
 
     public double getDistance() {
         double distance;

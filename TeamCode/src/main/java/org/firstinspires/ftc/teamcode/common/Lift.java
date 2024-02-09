@@ -3,16 +3,19 @@ package org.firstinspires.ftc.teamcode.common;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.common.Constants;
 
 public class Lift {
     private final DcMotorEx liftMotor;
+    protected TouchSensor lift_sensor = null;
     private LinearOpMode opMode;
 
     public Lift(LinearOpMode opMode) {
         this.opMode = opMode;
 
+        lift_sensor = opMode.hardwareMap.get(TouchSensor.class, "lift_sensor");
         liftMotor = opMode.hardwareMap.get(DcMotorEx.class, "lift");
         liftMotor.setDirection(DcMotor.Direction.REVERSE);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -73,5 +76,14 @@ public class Lift {
         liftMotor.setTargetPosition(targetPosition);
         liftMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         liftMotor.setPower(Constants.liftStopPowerFactor);
+    }
+    public void liftZero(){
+        liftDown(0.2);
+        while (!lift_sensor.isPressed()){
+        }
+        stop();
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 }

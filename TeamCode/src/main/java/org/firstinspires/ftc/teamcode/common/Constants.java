@@ -43,8 +43,8 @@ public class Constants {
     public static final int liftAutoLowCruisingPosition = 100;
 
     // Wrist settings
-    public static final double wristDownPosition = 0.9;
-    public static final double wristMiddlePosition = 0.8;
+    public static final double wristDownPosition = 1;
+    public static final double wristMiddlePosition = 0.77;
     public static final double wristUpPosition = 0.5;
 
     // Grabber settings
@@ -52,9 +52,10 @@ public class Constants {
     public static final double grabberOpenPosition = 1.5;
 
     // Launcher settings
-    public static final double launcherLockedPosition = 0.9;
+    public static final double launcherLockedPosition = 1;
     public static final double launcherUnlockedPosition = 0.55;
-
+    public static final double pokeyDownPosition = 0;
+    public static final double pokeyUpPosition = 1;
     // Prop Detection Settings
     public static final double pdDistanceToEscapePosition = 14;
     public static final double pdLeftPlacementDistance = 8;
