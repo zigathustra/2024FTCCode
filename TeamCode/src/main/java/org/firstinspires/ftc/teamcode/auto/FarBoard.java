@@ -36,7 +36,7 @@ public class FarBoard extends AutoMaster {
     }
     protected void park(double boardDirection, int targetAprilTagNumber, double parkDirection)
     {
-        bot.moveStraightForDistance(6);
+        bot.moveStraightForDistance(2);
     }
 }
 

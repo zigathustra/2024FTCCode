@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class Constants {
     // Drivetrain Settings
     public static final double drivetrainLength = 14;
-    public static final double distanceBetweenSensors = 8.75;
+    public static final double distanceBetweenSensors = 8.5;
     public static double sensorToDrivetrainMiddle = distanceBetweenSensors/2; // Distance from distance sensor to the middle of the drivetrain
     public static double cameraToDrivetrainMiddle = distanceBetweenSensors/2; // Distance from camera to the middle of the drivetrain
     public static final double driveTrainMaxVelocity = GoBilda312DcMotorData.maxCountsPerSec;
@@ -21,7 +21,7 @@ public class Constants {
     public static final double maxSlowedSpeed = 0.6;
     public static final double maxCreepSpeed = 0.15;
     public static final double maxAutoSpeed = 0.75;
-    public static final double maxAutoSuperSpeed = .90;
+    public static final double maxAutoSuperSpeed = .95;
     public static final double autoTurnGain = 0.02;   // Larger is more responsive, but also less stable
     public static final double autoDriveGain = 0.03;
     public static final double maxAutoStrafeSpeed = 0.75;
@@ -38,7 +38,7 @@ public class Constants {
     public static final int liftMinPosition = 0;
     public static final int liftMinTolerance = 25;
     public static final int liftAutoBoardProbePosition = 1750;
-    public static final int liftAutoBoardPlacementPosition = 900;
+    public static final int liftAutoBoardPlacementPosition = 800;
     public static final int liftAutoHighCruisingPosition = 550;
     public static final int liftAutoLowCruisingPosition = 100;
 
@@ -53,18 +53,19 @@ public class Constants {
 
     // Launcher settings
     public static final double launcherLockedPosition = 1;
-    public static final double launcherUnlockedPosition = 0.55;
-    public static final double pokeyDownPosition = 0;
-    public static final double pokeyUpPosition = 1;
+    public static final double launcherUnlockedPosition = 0.75;
+    public static final double pusherUpPosition = 0;
+    public static final double pusherDownPosition = 0.5;
+    public static final double pixelDistance = 1;
     // Prop Detection Settings
     public static final double pdDistanceToEscapePosition = 14;
-    public static final double pdLeftPlacementDistance = 8;
+    public static final double pdLeftPlacementDistance = 13.75;
     public static final double pdLeftHeading = 90;
-    public static final double pdCenterPlacementDistance = 24.0;
+    public static final double pdCenterPlacementDistance = 28.0;
     public static final double pdCenterHeading = 0;
-    public static final double pdRightPlacementDistance = 9.5;
+    public static final double pdRightPlacementDistance = 14.5;
     public static final double pdRightHeading = -90;
-    public static final double pdEscapeStrafeDistance = 23;
+    public static final double pdEscapeStrafeDistance = 23.5;
 
 
     // April Tag Detection Settings
@@ -74,8 +75,8 @@ public class Constants {
     public static final double atMaxAxial = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     public static final double atMaxStrafe = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
     public static final double atMaxYaw = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
-    public static final int atExposureMS = 6;
-    public static final int atExposureGain = 250;
+    public static final int atExposureMS = 1;
+    public static final int atExposureGain = 255;
 
     // Pixel placement settings
     public static final double boardApproachDistance = 4;

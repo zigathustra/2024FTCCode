@@ -16,9 +16,11 @@ public class TeleOp528 extends LinearOpMode {
         double driveYaw = 0.0;
         double leftTrigger = 0.0;
         double rightTrigger = 0.0;
+        boolean sensing = false;
 
         bot = new TeleOpBot(this);
         bot.wristMiddle();
+        bot.pusherUp();
         waitForStart();
 
         while (opModeIsActive()&&!gamepad1.ps) {
@@ -76,10 +78,15 @@ public class TeleOp528 extends LinearOpMode {
                 bot.launcherLocked();
             }
             if(gamepad1.right_bumper){
-                bot.pokeyUp();
-            }else if(gamepad1.left_bumper){
-                bot.pokeyDown();
+                bot.pusherUp();
+            } else if(gamepad1.left_bumper){
+                bot.pusherDown();
             }
+            //if(bot.isWristDown()){
+                //sensing = true;
+            //}else{
+                //sensing = false;
+            //}
         }
     }
 }

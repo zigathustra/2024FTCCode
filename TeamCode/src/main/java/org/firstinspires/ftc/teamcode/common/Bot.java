@@ -16,9 +16,10 @@ public class Bot {
     protected Servo wrist = null;
     protected Servo grabber = null;
     protected Servo launcher = null;
-    protected Servo pokey = null;
+    protected Servo pusher = null;
     protected Rev2mDistanceSensor distanceSensor = null;
     protected TouchSensor touchSensor = null;
+    protected boolean isWristDown = true;
     protected LinearOpMode opMode = null;
     protected double maxSpeed = Constants.maxNormalSpeed; // Default speed. Reassigned in the constructor.
 
@@ -54,8 +55,8 @@ public class Bot {
         launcher = opMode.hardwareMap.get(Servo.class, "launcher");
         launcher.setPosition(Constants.launcherLockedPosition);
 
-        pokey = opMode.hardwareMap.get(Servo.class, "pokey");
-        pokey.setPosition(Constants.pokeyDownPosition);
+        pusher = opMode.hardwareMap.get(Servo.class, "pusher");
+        pusher.setPosition(Constants.pusherDownPosition);
 //        opMode.telemetry.addData("d_sensor ", 1);
 //        opMode.telemetry.update();
 //        opMode.sleep (1000);
@@ -149,13 +150,16 @@ public class Bot {
 
     public void wristUp() {
         wrist.setPosition(Constants.wristUpPosition);
+        isWristDown = false;
     }
 
     public void wristMiddle() {
         wrist.setPosition(Constants.wristMiddlePosition);
+        isWristDown = true;
     }
     public void wristDown() {
         wrist.setPosition(Constants.wristDownPosition);
+        isWristDown = false;
     }
     public void wristToPosition(double position) {
         wrist.setPosition(position);
@@ -171,16 +175,18 @@ public class Bot {
     public void launcherLocked(){ launcher.setPosition(Constants.launcherLockedPosition);}
 
     public void launcherUnlocked(){ launcher.setPosition(Constants.launcherUnlockedPosition);}
-    public void pokeyDown(){ pokey.setPosition(Constants.pokeyDownPosition);}
-    public void pokeyUp(){ pokey.setPosition(Constants.pokeyUpPosition);}
+    public void pusherDown(){ pusher.setPosition(Constants.pusherDownPosition);}
+    public void pusherUp(){ pusher.setPosition(Constants.pusherUpPosition);}
 
     public double getDistance() {
         double distance;
-        opMode.sleep(50);
+        opMode.sleep(25);
         distance = distanceSensor.getDistance(DistanceUnit.INCH);
-        opMode.sleep(50);
         return (distance);
     }
+    //public boolean isWristDown(){
+        //return isWristDown;
+    //}
 }
 
 

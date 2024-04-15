@@ -49,9 +49,9 @@ public abstract class AutoMaster extends LinearOpMode {
         parkDirection = determineParkDirection(parkPosition, boardDirection);
 
         visionSensor.goToPropDetectionMode();
-
-        bot.wristMiddle();
         bot.grabberClose();
+        bot.wristUp();
+        bot.pusherUp();
         sleep(500);
 
         while (!isStarted() && !isStopRequested()) {
@@ -71,8 +71,7 @@ public abstract class AutoMaster extends LinearOpMode {
             bot.moveStraightForDistance(Constants.pdDistanceToEscapePosition);
 
             // Place pixel on correct spike mark and return to escape position
-            // Use propDirection determined using webcam during init
-            placePropPixel(propDirection, riggingDirection);
+            // Use propDirection determined using webcam during initlacePropPixel(propDirection, riggingDirection);
 
             roughTravelToBoard(boardDirection, riggingDirection);
 
